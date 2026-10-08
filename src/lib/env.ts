@@ -26,6 +26,7 @@ export const env = {
     (typeof window !== 'undefined' ? window.location.origin : ''),
   mockScenario: import.meta.env.VITE_MOCK_SCENARIO ?? 'default',
   isDemo: mode === 'demonstration',
+  resendApiKey: import.meta.env.VITE_RESEND_API_KEY ?? '',
 } as const
 
 export type Env = typeof env

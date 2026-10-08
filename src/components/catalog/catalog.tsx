@@ -33,6 +33,7 @@ export const catalogSearchSchema = z.object({
   q: z.string().optional(),
   categories: z.string().optional(),
   rarities: z.string().optional(),
+  network: z.string().optional(),
   minPrice: z.string().optional(),
   maxPrice: z.string().optional(),
   sort: z
@@ -53,9 +54,11 @@ export interface CatalogProps {
   tab: 'all' | 'new' | 'trending'
   sort: NftSort
   activeCategories: NftCategory[]
+  activeNetworks: string[]
   onTabChange: (tab: 'all' | 'new' | 'trending') => void
   onSortChange: (sort: NftSort) => void
   onToggleCategory: (key: NftCategory) => void
+  onToggleNetwork: (key: string) => void
   data?: { items: Nft[]; page: number; totalPages: number; total: number }
   isLoading: boolean
   isError: boolean
@@ -204,13 +207,15 @@ export function CatalogSection(props: CatalogProps) {
 
 function Sidebar({
   activeCategories,
+  activeNetworks,
   onToggleCategory,
+  onToggleNetwork,
   minPrice,
   maxPrice,
   onPriceChange,
 }: Pick<
   CatalogProps,
-  'activeCategories' | 'onToggleCategory' | 'minPrice' | 'maxPrice' | 'onPriceChange'
+  'activeCategories' | 'activeNetworks' | 'onToggleCategory' | 'onToggleNetwork' | 'minPrice' | 'maxPrice' | 'onPriceChange'
 >) {
   const { t, i18n } = useTranslation()
   const fmt = new Intl.NumberFormat(i18n.language, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -293,10 +298,16 @@ function Sidebar({
           {NETWORKS.map((network) => (
             <li
               key={network.label}
-              className="mx-3 flex h-10 w-[calc(100%-1.5rem)] items-center justify-between text-[15px] text-kurio-sand"
+              className="mx-3 flex h-10 w-[calc(100%-1.5rem)] items-center justify-between text-[15px] transition-colors"
             >
-              <span>{network.label}</span>
-              <span>({network.count})</span>
+              <button
+                type="button"
+                onClick={() => onToggleNetwork?.(network.label)}
+                className={`flex w-full items-center justify-between ${activeNetworks.includes(network.label) ? 'text-kurio-copperLight' : 'text-kurio-sand hover:text-kurio-cream'}`}
+              >
+                <span>{network.label}</span>
+                <span className="font-bold">({network.count})</span>
+              </button>
             </li>
           ))}
         </ul>
@@ -336,9 +347,11 @@ export function FeaturedBanner() {
 export function NftCard({ nft, showRarityBadge = false }: { nft: Nft; showRarityBadge?: boolean }) {
   const { t } = useTranslation()
   const art640 = nft.imageUrl.replace('-1280', '-640')
+  // Extrair número do ID (ex: "nft-001" -> "001")
+  const nftNumber = nft.id.replace('nft-', '')
   return (
     <li data-aos="fade-up" className="group">
-      <Link to="/nfts/$nftId" params={{ nftId: nft.id }} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kurio-copper">
+      <Link to="/mercado/nft/$nftNumber" params={{ nftNumber }} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kurio-copper">
         <div className="relative h-[200px] overflow-hidden rounded-xl bg-gradient-to-b from-kurio-surface to-kurio-surface2 md:h-[300px]">
           <img
             src={nft.imageUrl}

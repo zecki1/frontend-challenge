@@ -25,10 +25,12 @@ function MarketplacePage() {
   const page = search.page ?? 1
   const tab = search.tab ?? 'all'
   const activeCategories = parseList<NftCategory>(search.categories)
+  const activeNetworks = parseList(search.network)
   const params: NftListParams = {
     q: search.q,
     categories: activeCategories,
     rarities: parseList(search.rarities),
+    networks: activeNetworks,
     minPrice: search.minPrice,
     maxPrice: search.maxPrice,
     sort: search.sort ?? TAB_SORTS[tab],
@@ -56,6 +58,16 @@ function MarketplacePage() {
     })
   }
 
+  const toggleNetwork = (key: string) => {
+    const current = new Set(activeNetworks ?? [])
+    if (current.has(key)) current.delete(key)
+    else current.add(key)
+    updateSearch({
+      network: current.size ? [...current].join(',') : undefined,
+      page: undefined,
+    })
+  }
+
   return (
     <div className="pb-24">
       <MarketplaceBanner />
@@ -63,9 +75,11 @@ function MarketplacePage() {
         tab={tab}
         sort={search.sort ?? TAB_SORTS[tab]}
         activeCategories={activeCategories ?? []}
+        activeNetworks={activeNetworks ?? []}
         onTabChange={(next) => updateSearch({ tab: next, sort: undefined, page: undefined })}
         onSortChange={(sort) => updateSearch({ sort, page: undefined })}
         onToggleCategory={toggleCategory}
+        onToggleNetwork={toggleNetwork}
         minPrice={search.minPrice}
         maxPrice={search.maxPrice}
         onPriceChange={(min, max) => updateSearch({ minPrice: min, maxPrice: max, page: undefined })}

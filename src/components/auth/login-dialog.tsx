@@ -1,4 +1,3 @@
-import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -6,7 +5,8 @@ import { useTranslation } from "react-i18next"
 import { useAuth } from "@/features/auth/auth-context"
 import { SocialButtons } from "@/components/auth/social-buttons"
 import { ApiError } from "@/lib/api-error"
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription, DialogClose, X } from "@/components/ui/dialog"
+import { LogOut } from "lucide-react"
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog"
 import { useNavigate } from "@tanstack/react-router"
 
 const loginSchema = z.object({
@@ -16,11 +16,10 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
-export function LoginModal() {
+export function LoginDialog() {
   const { t } = useTranslation()
-  const { login, isAuthenticated } = useAuth()
+  const { login } = useAuth()
   const navigate = useNavigate()
-  const [open, setOpen] = React.useState(false)
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -39,17 +38,18 @@ export function LoginModal() {
   })
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog>
       <DialogTrigger asChild>
         <button
           type="button"
           className="flex h-[35px] items-center gap-1 rounded-md bg-kurio-copper px-4 font-mono text-base font-medium text-kurio-bg transition-colors hover:bg-kurio-copperLight"
         >
+          <LogOut className="h-5 w-5" aria-hidden />
           {t("nav.entrar")}
         </button>
       </DialogTrigger>
 
-      <DialogContent className="p-6">
+      <DialogContent className="p-6 max-w-md">
         <DialogHeader>
           <DialogTitle>{t("auth.loginTitle")}</DialogTitle>
         </DialogHeader>
@@ -127,15 +127,6 @@ export function LoginModal() {
           </div>
         </DialogFooter>
       </DialogContent>
-
-      <DialogClose>
-        <button
-          type="button"
-          className="absolute right-4 top-4 rounded-sm p-1 hover:bg-kurio-surface2 transition-colors"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </DialogClose>
     </Dialog>
   )
 }

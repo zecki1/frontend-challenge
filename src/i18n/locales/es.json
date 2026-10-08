@@ -206,7 +206,24 @@
       "utility": "Utilidad"
     },
     "walletsTitle": "Carteras compatibles",
-    "copyright": "© 2026 Kurio. Propiedad digital para todos."
+    "copyright": "© 2026 Kurio. Propiedad digital para todos.",
+    "newsletter": {
+      "badge": "W  C  D",
+      "title": "Anticípate al próximo lanzamiento",
+      "subtitle": "Recibe lanzamientos seleccionados, historias de creadores y novedades del mercado.",
+      "placeholder": "introduce tu email...",
+      "submit": "Enviar",
+      "success": "¡Inscrito!",
+      "error": "Error al inscribir. Inténtalo de nuevo."
+    },
+    "features": {
+      "walletSecurityTitle": "Seguridad de la cartera",
+      "walletSecurityDesc": "Protege tu cartera y colecciona arte digital verificado con confianza.",
+      "featuredCreatorsTitle": "Creadores destacados",
+      "featuredCreatorsDesc": "Conoce artistas, estudios y comunidades que moldean la cultura digital.",
+      "launchAlertsTitle": "Alertas de lanzamientos",
+      "launchAlertsDesc": "Recibe calendarios de acuñación, novedades de listas de acceso y análisis de mercado."
+    }
   },
   "cart": {
     "title": "Carrito",

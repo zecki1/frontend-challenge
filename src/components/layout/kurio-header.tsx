@@ -1,10 +1,11 @@
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
-import { LogOut, Search, ShoppingBag } from 'lucide-react'
+import { Search, ShoppingBag } from 'lucide-react'
 import { cartApi, queryKeys } from '@/api'
 import { useAuth } from '@/features/auth/auth-context'
 import { LanguageSwitcher } from '@/components/language-switcher'
+import { LoginDialog } from '@/components/auth/login-dialog'
 
 /**
  * Cabeçalho KURIO — Figma "Header With Divider" (1200×46 + divisor #d28a4c):
@@ -97,13 +98,7 @@ export function KurioHeader() {
               </button>
             </div>
           ) : (
-            <Link
-              to="/login"
-              className="flex h-[35px] items-center gap-1 rounded-md bg-kurio-copper px-4 font-mono text-base font-medium text-kurio-bg transition-colors hover:bg-kurio-copperLight"
-            >
-              <LogOut className="h-5 w-5" aria-hidden />
-              {t('nav.entrar')}
-            </Link>
+            <LoginDialog />
           )}
           <LanguageSwitcher />
         </div>

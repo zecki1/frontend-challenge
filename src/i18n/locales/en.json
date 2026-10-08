@@ -206,7 +206,24 @@
       "utility": "Utility"
     },
     "walletsTitle": "Supported wallets",
-    "copyright": "© 2026 Kurio. Digital property for everyone."
+    "copyright": "© 2026 Kurio. Digital property for everyone.",
+    "newsletter": {
+      "badge": "W  C  D",
+      "title": "Stay ahead of the next drop",
+      "subtitle": "Get curated drops, creator stories, and market insights.",
+      "placeholder": "enter your email...",
+      "submit": "Subscribe",
+      "success": "Subscribed!",
+      "error": "Failed to subscribe. Please try again."
+    },
+    "features": {
+      "walletSecurityTitle": "Wallet Security",
+      "walletSecurityDesc": "Protect your wallet and collect verified digital art with confidence.",
+      "featuredCreatorsTitle": "Featured Creators",
+      "featuredCreatorsDesc": "Discover artists, studios, and communities shaping digital culture.",
+      "launchAlertsTitle": "Launch Alerts",
+      "launchAlertsDesc": "Get mint calendars, allowlist updates, and market analysis."
+    }
   },
   "cart": {
     "title": "Cart",

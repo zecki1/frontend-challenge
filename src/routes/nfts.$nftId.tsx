@@ -24,7 +24,7 @@ export const Route = createFileRoute('/nfts/$nftId')({
 
 const REVIEW_COUNT = 19
 
-function NftDetailPage() {
+export function NftDetailPage() {
   const { nftId } = Route.useParams()
   const { t } = useTranslation()
   const queryClient = useQueryClient()

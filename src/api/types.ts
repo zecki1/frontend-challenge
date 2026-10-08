@@ -184,6 +184,7 @@ export interface NftListParams {
   q?: string
   categories?: NftCategory[]
   rarities?: NftRarity[]
+  networks?: string[]
   minPrice?: string
   maxPrice?: string
   sort?: NftSort

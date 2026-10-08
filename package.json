@@ -85,6 +85,7 @@
     "react-resizable-panels": "^3.0.6",
     "react-rewards": "^2.1.0",
     "recharts": "^2.15.4",
+    "resend": "^6.32.1",
     "socket.io-client": "^4.8.4",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
