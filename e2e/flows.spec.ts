@@ -16,9 +16,15 @@ test.beforeEach(async ({ page }) => {
 
 async function login(page: import("@playwright/test").Page) {
   await page.goto("/login");
-  await page.getByLabel("E-mail").fill("collector@example.com");
-  await page.getByLabel("Senha").fill("password123");
-  await page.getByRole("button", { name: "Entrar" }).click();
+  // `exact: true` evita casar com o aria-label do input da newsletter do footer.
+  await page.getByLabel("E-mail", { exact: true }).fill("collector@example.com");
+  await page.getByLabel("Senha", { exact: true }).fill("password123");
+  // O header também expõe um botão "Entrar" (abre o modal de login);
+  // restringimos ao formulário para evitar violação de strict mode.
+  await page
+    .locator("form")
+    .getByRole("button", { name: "Entrar" })
+    .click();
   await expect(page).not.toHaveURL(/\/login/);
   if (test.info().project.name === "chromium-desktop") {
     await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
