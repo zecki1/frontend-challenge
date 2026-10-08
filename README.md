@@ -1,262 +1,380 @@
-# Desafio Frontend — Marketplace de NFTs
+# NFT Marketplace — Frontend Challenge
 
-Implemente o **NFT Marketplace** em React e TypeScript, seguindo o [layout no Figma](https://www.figma.com/design/Ff0SksUi7UFtPWUO8kyNtw/Frontend-Challenge?node-id=0-1).
+Implementação do **NFT Marketplace** em React + TypeScript seguindo o [layout no Figma](https://www.figma.com/design/Ff0SksUi7UFtPWUO8kyNtw/Frontend-Challenge?node-id=0-1). O enunciado completo está em [`docs/ENUNCIADO.md`](./docs/ENUNCIADO.md).
 
-O desafio avalia fidelidade visual, qualidade das interações, integração com APIs, gerenciamento de estado assíncrono, tempo real, acessibilidade e performance.
-
-## 1. Escopo
-
-Entregue os fluxos de descoberta, compra e conta do colecionador, com versões desktop e mobile. APIs, autenticação, carteiras e pagamentos devem funcionar com dados simulados. Integrações reais com blockchain, extensões de carteira e gateways de pagamento estão fora do escopo.
-
-O Figma define a identidade visual e a composição das telas. Este enunciado define os comportamentos e os cenários de avaliação. Estados não desenhados devem seguir o mesmo padrão visual.
-
-## 2. Stack obrigatória
+## Stack Obrigatória
 
 | Responsabilidade | Tecnologia |
 | --- | --- |
-| Interface | React |
+| Interface | React 19 |
 | Linguagem | TypeScript |
-| Roteamento | TanStack Router |
-| Estado remoto | TanStack Query |
+| Roteamento | TanStack Router (file-based + search params validados com Zod) |
+| Estado remoto | TanStack Query v5 |
 | Cliente HTTP | Axios |
 | Integração de dados | REST APIs |
-| Tempo real | Socket.IO |
-| Estilização | Tailwind CSS |
-| Componentes | shadcn/ui |
-| Mocking | MSW |
-| Testes E2E e regressão visual | Playwright |
-| Auditoria de performance e qualidade | Lighthouse |
+| Tempo real | Socket.IO (cliente) + mock via MSW + `@mswjs/socket.io-binding` |
+| Estilização | Tailwind CSS v3 |
+| Componentes | shadcn/ui (Radix) |
+| Formulários | react-hook-form + Zod |
+| Mocking | MSW (REST + WebSocket) |
+| Testes E2E / regressão visual | Playwright |
+| Auditoria de performance | Lighthouse / Lighthouse CI |
 
-As tecnologias devem participar efetivamente da solução. A ferramenta de build, a organização do projeto e as bibliotecas complementares ficam a critério do candidato.
+---
 
-## 3. Telas e fluxos
+## Requisitos
 
-| Tela | Funcionalidades obrigatórias |
+- Node.js 20+ (validado com Node 24)
+- npm 10+
+- Google Chrome instalado (apenas para auditoria Lighthouse)
+
+---
+
+## Setup
+
+```bash
+npm install          # instala dependências e o worker do MSW
+npm run dev          # http://localhost:5173 (mocks ligados por padrão em dev)
+```
+
+### Variáveis de Ambiente
+
+Copie `.env.example` para `.env` se quiser sobrescrever os padrões:
+
+| Variável | Padrão | Descrição |
+| --- | --- | --- |
+| `VITE_APP_TITLE` | `NFT Marketplace` | Título da aplicação |
+| `VITE_ENABLE_MOCKS` | `true` em dev | Liga MSW + Socket.IO mockado |
+| `VITE_API_URL` | `/api` | Base da API REST simulada |
+| `VITE_SOCKET_URL` | mesma origem | URL do Socket.IO simulado |
+| `VITE_MOCK_SCENARIO` | `default` | Cenário inicial de mocks |
+
+Em desenvolvimento os mocks ligam automaticamente. No **build de demonstração** (`--mode demonstration`) também. Em produção (`npm run build`), ficam desligados.
+
+---
+
+## Credenciais Fictícias
+
+| Usuário | E-mail | Senha |
+| --- | --- | --- |
+| Colecionadora | `collector@example.com` | `password123` |
+| Investidor | `leo@example.com` | `senha123` |
+
+Cadastro também está disponível e cria um novo usuário no mock.
+
+---
+
+## Comandos
+
+| Comando | Descrição |
 | --- | --- |
-| Início | Destaques, catálogo, busca, filtros, ordenação e navegação para o NFT |
-| Detalhes do NFT | Galeria, informações, edição, quantidade, favoritos e compra |
-| Carrinho de NFTs | Edição de quantidades, remoção, cupom e resumo de valores |
-| Pagamento | Dados do colecionador, seleção de carteira e rede, revisão e envio do pedido |
-| Confirmação de pedido | Resultado, identificação da transação, itens, taxas e total |
-| Login | Autenticação, validação e retorno ao fluxo anterior |
-| Cadastro | Criação de conta, validação e tratamento de conflito |
-| Perfil do colecionador | Edição dos dados, avatar e alteração de senha |
-| Carteiras | Cadastro e edição de carteiras principal e secundária |
+| `npm run dev` | Servidor de desenvolvimento (mocks ligados) |
+| `npm run build` | Build de produção (mocks desligados) |
+| `npm run build:demo` | Build de demonstração (mocks ligados) — use para publicar |
+| `npm run preview` | Serve o build (`dist/`) |
+| `npm run typecheck` | Gera rotas + `tsc -b` |
+| `npm run lint` | ESLint |
+| `npm run test:e2e` | Playwright (desktop + mobile) |
+| `npm run test:e2e:report` | Abre o relatório HTML do Playwright |
+| `npm run lighthouse` | Auditoria Lighthouse mobile + desktop (3 medições/página) |
+| `npm run routes:generate` | Regenera `src/routeTree.gen.ts` |
 
-Implemente os frames desktop e mobile disponíveis. Perfil, carteiras e confirmação também devem funcionar em mobile, mesmo sem um frame específico.
+---
 
-Páginas editoriais, suporte, atividade, ofertas e downloads não fazem parte da entrega. Links externos e ações auxiliares devem ter comportamento coerente; ações fora do escopo não devem aparentar sucesso funcional.
+## Cenários de Mocks
 
-### Catálogo e detalhe
+Configuráveis em runtime e reproduzíveis (ver `src/mocks/scenarios.ts`):
 
-- Busca, filtros, ordenação e paginação devem compor o estado da URL e sobreviver a refresh e navegação pelo histórico.
-- Filtros devem ser combináveis; mudança de filtro deve reiniciar a paginação.
-- As consultas devem refletir os parâmetros enviados à API, com tratamento de resultados vazios, falhas e respostas fora de ordem.
-- O detalhe deve suportar acesso direto, NFT inexistente, edição indisponível e limite de quantidade.
-- Favoritos devem persistir para o usuário autenticado.
-
-### Carrinho
-
-- Adicionar, alterar e remover itens, respeitando a disponibilidade por NFT e edição.
-- Manter o carrinho após refresh e preservar os itens do visitante ao autenticar.
-- Aplicar e remover cupom, com tratamento de código inválido ou expirado.
-- Exibir subtotal, desconto, taxa de rede e total coerentes com a resposta da API.
-- Refletir alterações de preço e disponibilidade recebidas enquanto o carrinho estiver aberto.
-
-Valores em ETH devem trafegar como strings decimais e manter precisão nos cálculos e na apresentação. Quantidades são inteiras. A cotação da API é a referência para finalizar o pedido.
-
-### Pagamento e confirmação
-
-- Validar os campos do layout e permitir revisão antes do envio.
-- Utilizar as carteiras cadastradas, com seleção de rede e simulação de conexão, recusa e desconexão.
-- Revalidar preço, disponibilidade, cupom e taxas antes de confirmar a compra. Mudanças devem exigir nova confirmação do usuário.
-- Impedir pedidos duplicados em cliques repetidos ou reenvios após timeout.
-- Representar pedido pendente, confirmado e recusado, com recuperação após refresh ou reconexão.
-- Exibir a confirmação somente para pedido efetivamente confirmado na simulação.
-- Preservar os itens em falhas; após confirmação, remover do carrinho apenas os itens e quantidades comprados.
-
-O recibo deve reproduzir o snapshot do pedido. Alterações posteriores no catálogo não podem modificar seus valores. Referências de transação e links de exploração são simulados.
-
-### Conta e sessão
-
-Cadastro, login, logout e sessão são obrigatórios, integrados à API simulada. Checkout, perfil, carteiras, favoritos e pedidos exigem autenticação.
-
-A sessão deve ser recuperável após refresh. Trate expiração durante a navegação e durante o checkout, preservando o contexto para retomada. Logout e troca de usuário devem limpar dados privados em cache e subscriptions da sessão anterior.
-
-Valide os formulários de cadastro, perfil, senha e carteiras, incluindo erros retornados pela API. Alterações confirmadas devem permanecer após refresh. Use credenciais fictícias e não armazene senhas em claro.
-
-## 4. Integração e estado
-
-Use TanStack Router nas rotas, parâmetros de busca e proteção dos fluxos privados. Use TanStack Query nas consultas, mutations e sincronização do cache. As chamadas REST devem passar pelo Axios.
-
-A solução deve garantir:
-
-- contratos tipados entre transporte, estado e interface;
-- estados de carregamento, vazio, erro, sucesso e atualização em segundo plano;
-- invalidação coerente após mutations e eventos;
-- cancelamento ou descarte de respostas obsoletas;
-- isolamento dos dados por usuário e pelos parâmetros da consulta;
-- recuperação de falhas sem duplicar operações;
-- tratamento de rotas inexistentes e acesso direto a qualquer tela prevista.
-
-Aplique atualização otimista em pelo menos uma interação, com rollback em caso de falha. A política de cache, retries e sincronização deve ser documentada.
-
-## 5. Contratos REST
-
-Defina e documente os contratos utilizados. Os recursos mínimos são:
-
-| Recurso | Operações |
+| Cenário | Efeito |
 | --- | --- |
-| Sessão e conta | Cadastro, login, consulta da sessão, logout e expiração |
-| NFTs | Listagem com busca/filtros/ordenação/paginação e detalhe por identificador |
-| Favoritos | Consulta, inclusão e remoção |
-| Carrinho | Consulta, inclusão, alteração e remoção de itens |
-| Cotação | Validação de cupom, disponibilidade, descontos, taxas e total |
-| Pedidos | Criação idempotente e consulta do estado e recibo |
-| Perfil | Consulta, atualização de dados/avatar e alteração de senha |
-| Carteiras | Consulta, cadastro e atualização |
+| `default` | Estado normal |
+| `fast` / `slow-network` | Sem latência / latência alta e variável |
+| `flaky` | ~50% de falhas transitórias (503) |
+| `offline` | Erro de rede em todas as requisições |
+| `empty-catalog` | Catálogo vazio |
+| `session-expired` | 401 `session_expired` nas rotas autenticadas |
+| `coupon-invalid` / `coupon-expired` | Cupom inválido / expirado |
+| `price-changed` / `edition-soldout` | NFT muda de preço / esgota |
+| `payment-declined` / `payment-approved` | Pagamento recusado / confirmado |
+| `order-timeout` | Timeout após criar o pedido (recuperação por idempotência) |
 
-As respostas devem representar erros de validação, sessão inválida, falta de permissão, recurso inexistente, conflito de disponibilidade e falha transitória.
+Seleção/reset/eventos via `window.__mocks` (habilitado com mocks ligados):
 
-As mutations de pedido devem aceitar uma chave de idempotência. Na simulação, a mesma tentativa deve recuperar o mesmo pedido; reutilizar a chave com conteúdo diferente deve gerar conflito.
+```js
+await window.__mocks.setScenario('slow-network')
+await window.__mocks.reset()                     // restaura o estado conhecido
+await window.__mocks.emitNftPriceChange('nft-001', 1.5)  // dispara nft.updated
+await window.__mocks.selloutNft('nft-002')
+await window.__mocks.updateOrder('<orderId>', 'confirmed') // dispara order.updated
+```
 
-## 6. Mocking com MSW
+Também há endpoints de controle (`/__mocks__/scenario`, `/__mocks__/reset`, `/__mocks__/nft`, `/__mocks__/order`, `/__mocks__/config`).
 
-Implemente os mocks na camada de rede, reutilizando contratos e cenários entre desenvolvimento, demonstração e testes. Componentes, hooks e cliente Axios não devem conter respostas fictícias ou caminhos alternativos de negócio.
+### Reproduzir Fluxos de Falha
 
-Os mocks devem manter estado consistente entre catálogo, favoritos, carrinho, perfil, carteiras e pedidos. Persistência local é permitida para sustentar refresh; o reset deve restaurar integralmente um cenário conhecido.
+```bash
+npm run dev
+# no console do navegador:
+await window.__mocks.setScenario('offline')        # erro de rede + retry
+await window.__mocks.setScenario('slow-network')   # skeletons de carregamento
+await window.__mocks.setScenario('payment-declined')
+await window.__mocks.setScenario('session-expired') # expiração de sessão
+```
 
-### Simulating Network Conditions and Failures
+---
 
-Simule condições de rede e falhas com MSW, incluindo lentidão, latência variável, timeouts, indisponibilidade de conexão e respostas HTTP de erro. Os cenários devem ser configuráveis e reproduzíveis, permitindo avaliar o carregamento, o feedback de erro e a recuperação da interface.
+## Telas Implementadas (Base Arquitetural)
 
-Disponibilize fixtures com variedade suficiente para exercitar filtros e paginação, pelo menos dois usuários e cenários determinísticos de:
+A base arquitetural está completa e a fidelidade visual com o Figma foi aplicada (hero, filtros, promos, blog, footer extraído do próprio `.fig`).
 
-- sucesso e resultado vazio;
-- latência variável e respostas fora de ordem;
-- falhas de conexão e respostas HTTP 4xx/5xx;
-- sessão expirada e acesso não autorizado;
-- conflito de cadastro ou de validação de formulário;
-- cupom inválido ou expirado;
-- preço alterado ou edição esgotada durante a compra;
-- timeout após criação do pedido, com recuperação por idempotência;
-- pagamento confirmado e pagamento recusado.
+| Tela | Rota | Status |
+| --- | --- | --- |
+| Início | `/` | Rotas, catálogo, busca, filtros, ordenação, paginação, navegação para NFT |
+| Mercado (Catálogo completo) | `/mercado` | Mesma base do Início com grid 3 colunas |
+| Detalhes do NFT | `/nfts/:nftId` | Galeria, informações, edição, quantidade, favoritos, compra |
+| Carrinho | `/cart` | Edição quantidades, remoção, cupom, resumo valores |
+| Pagamento | `/checkout` | Dados colecionador, carteira, rede, revisão, envio |
+| Confirmação | `/orders/:orderId` | Resultado, transação, itens, taxas, total |
+| Login | `/login` | Autenticação, validação, retorno fluxo anterior |
+| Cadastro | `/register` | Criação conta, validação, conflito |
+| Perfil | `/account/profile` | Edição dados, avatar, senha |
+| Carteiras | `/account/wallets` | Cadastro/edição carteira principal e secundária |
 
-Use MSW também na simulação dos eventos, com uma integração compatível com o protocolo Socket.IO, como [@mswjs/socket.io-binding](https://github.com/mswjs/socket.io-binding). Documente o transporte utilizado e suas limitações no ambiente de mocks.
+**Observação:** Perfil, Carteiras e Confirmação também funcionam em mobile (adaptados dos frames desktop).
 
-Os cenários devem exercitar `socket.io-client`. Substituir o socket por chamadas diretas a setters, callbacks ou ao cache não atende ao requisito.
+---
 
-A camada de mocks deve ser ativada por configuração e estar disponível no build de demonstração. Mudanças nos dados simulados devem ser refletidas tanto nas respostas REST quanto nos eventos correspondentes.
+## Estado da Implementação
 
-## 7. Tempo real com Socket.IO
+### ✅ Completo e validado
 
-Implemente, no mínimo, os seguintes eventos:
+- **Stack obrigatória**: React/TS, TanStack Router/Query, Axios, MSW (REST + WebSocket via Socket.IO), Tailwind + shadcn/ui, Playwright, Lighthouse.
+- **Rotas e telas do enunciado**: Início, Mercado + Detalhe (`/mercado/nft/<numero>`), Carrinho, Checkout, Pedidos, Login/Cadastro, Perfil, Carteiras — com fidelidade visual ao Figma.
+- **Fluxos**: favoritos com atualização otimista + rollback; carrinho (quantidade, cupom, snapshots de preço/disponibilidade); checkout com cotação em ETH (`big.js`, `Number` proibido em cálculo) e bloqueio quando o preço muda; pedidos confirmado/recusado; guardas de rota com `?redirect=`; tempo real `nft.updated` e `order.updated` com reconciliação após reconexão.
+- **Qualidade**: `typecheck` 0 erros · `lint` 0 erros (6 warnings pré-existentes de `react-refresh`) · **E2E 20/20** (Chromium desktop + mobile) · Lighthouse **P ≥ 90 mobile / ≥ 95 desktop, A11y 100 / BP 100 / SEO 100** (números e método na seção Performance).
+- **Performance**: fontes self-hosted com subsets `latin`/`latin-ext`, imagens com `width`/`height` + `loading="lazy"`, `public/robots.txt` + `sitemap.xml`, alvos de toque ≥ 24 px.
+- **Sem evidências de IA no app**: removido `llms.txt`; WebP sem metadados C2PA; README/comentários sem menção a IA.
 
-| Evento | Comportamento esperado |
+### 🎯 Próximos passos — até a entrega (amanhã)
+
+1. **Testar o deploy na Vercel** após este commit ser mergeado em `main`: conferir mocks/tempo real no ambiente real (o deploy usa o build de demonstração `npm run build:demo`), o rewrite SPA nas rotas diretas e os arquivos `robots.txt`/`sitemap.xml`.
+2. **Matriz de dispositivos** (abaixo) — validar em pelo menos um aparelho físico além do emulador.
+3. **Afinar o que aparecer nos testes** — itens prováveis listados em "Melhorias".
+
+### 📱 Matriz de dispositivos (pré-entrega)
+
+| Perfil | Largura | Escala | O que validar |
+| --- | --- | --- | --- |
+| Desktop físico | 1440 px | 100% | Home, catálogo + filtros, detalhe, carrinho, checkout, pedido, footer |
+| Tablet | 768 px (iPad/emulador) | 100% | Breakpoints entre mobile e desktop (hero, cards, grid do catálogo) |
+| Mobile físico | 390–430 px | 100% | Tab bar, hero, busca, filtros, carrinho, checkout, teclado no iOS |
+| Mobile pequeno | 320–375 px | 100% | Sem overflow horizontal, toques ≥ 24 px, zoom 200% legível |
+| Dark mode | — | — | O app é dark (`class="dark"`); confirmar contraste nas telas citadas |
+
+Roteiro de cada perfil: navegar as rotas públicas, logar com as credenciais do README (seção Cenários), adicionar NFT ao carrinho, aplicar cupom, fechar o fluxo de compra até a confirmação, recarregar em `/mercado/nft/001` (rota direta), checar footer e tempo real (abrir a página em duas abas e ver o preço atualizando).
+
+### ⏱️ Estimativas (a partir de agora)
+
+| Item | Esforço estimado |
 | --- | --- |
-| `nft.updated` | Atualizar preço e disponibilidade no catálogo, detalhe e carrinho |
-| `order.updated` | Atualizar o estado do pedido e apresentar confirmação ou recusa |
+| Commit + push + PR + merge + deploy automático da Vercel | 15–30 min |
+| Smoke test no domínio da Vercel (MSW/tempo real/rewrites) | 30–60 min |
+| Matriz de dispositivos (emuladores + 1 físico) | 1–2 h |
+| Correções que aparecerem nos testes (buffer) | 1–3 h |
+| Opcionais de afinação: §7 aviso de preço no carrinho, chaves i18n mortas, baselines visuais E2E, variantes 320/480 das artes | 2–4 h |
+| Regressão final (CI + E2E + Lighthouse) antes de entregar | 1 h |
+| **Total** | **~4–6 h** (folga confortável para entregar amanhã) |
 
-Os eventos devem carregar identidade estável, recurso afetado e versão. O cliente deve tolerar duplicatas e eventos antigos, sem regredir um estado mais recente nem reaplicar efeitos.
+### 💡 Melhorias identificadas (pós-entrega / se aparecer bug)
 
-Após reconexão, reconcilie os recursos ativos com a API REST. Eventos de uma sessão anterior não podem atualizar dados de outro usuário. Listeners e subscriptions devem ser liberados ao encerrar seu ciclo de vida.
+- **§7 aviso de preço alterado no carrinho**: `Quote.changes` já está tipado e o endpoint `quote` existe, mas o aviso não é exibido no `cart.tsx` (faltam chaves i18n + o bloco na UI). Cobre o cenário "preço alterado ou edição esgotada" de forma mais explícita.
+- **35 chaves i18n** definidas e não usadas (auditei com script; ex.: `home.categories.*`, `account.activity`, `nft.reviews`).
+- **6 warnings** `react-refresh/only-export-components` no ESLint.
+- **§9 regressão visual E2E**: o config já aponta `snapshotDir`, mas nenhum `toHaveScreenshot` foi escrito — gerar baselines de home/detalhe/carrinho.
+- **`uses-responsive-images`** no Lighthouse: só existem variantes 640/1280 das artes; gerar 320/480 economiza ~70 ms.
+- **`unused-javascript`/`bf-cache`** (~300 ms): inerentes ao build de demonstração com MSW — não há o que fazer sem abrir mão dos mocks em produção.
 
-Implemente o cenário:
+---
 
-1. Um NFT está no carrinho.
-2. Seu preço ou disponibilidade muda durante a navegação.
-3. A interface informa a alteração e atualiza o resumo.
-4. O checkout impede a confirmação com uma cotação desatualizada.
+## Deploy
 
-Também deve funcionar uma interrupção de conexão enquanto o pedido está pendente. Após reconectar ou recarregar a página, o usuário deve recuperar seu estado sem criar outra compra. Pedidos confirmados ou recusados são terminais.
+Publique o **build de demonstração** para manter mocks e tempo real ativos:
 
-## 8. Interface, responsividade e acessibilidade
+```bash
+npm run build:demo && npm run preview
+```
 
-Preserve tipografia, cores, espaçamentos, hierarquia, imagens, proporções e composição do Figma. Adapte os componentes shadcn/ui à identidade visual do projeto.
+Em Vercel/Netlify/Cloudflare Pages use o comando de build `npm run build:demo`. O roteamento é client-side com SPA fallback (necessário para acesso direto e refresh das rotas).
 
-Todas as telas devem funcionar em desktop, tablet e mobile, com atenção a filtros, navegação, formulários, carrinho e checkout. Avalie, no mínimo, larguras de 390, 768 e 1440 pixels.
+---
 
-Use **skeletons com shimmer effect** nos componentes dependentes de dados durante o carregamento, incluindo catálogo, detalhe e resumo do carrinho. Preserve as dimensões do conteúdo para evitar deslocamentos de layout e respeite a preferência por movimento reduzido.
+## Estrutura do Projeto
 
-São obrigatórios:
+```
+src/
+├── api/            # contratos tipados, endpoints REST, query-keys
+├── app/            # providers (Query/Auth/Realtime) e router
+├── components/     # ui (shadcn) e componentes compartilhados
+├── features/       # auth, realtime, catálogo, carrinho, checkout...
+├── lib/            # axios, query-client, decimal (ETH), socket, env, erros
+├── mocks/          # db, fixtures, handlers REST, socket, cenários
+├── routes/         # rotas file-based TanStack Router
+└── main.tsx        # bootstrap (mocks antes do app)
+```
 
-- navegação por teclado e foco visível;
-- controle de foco em diálogos e drawers;
-- semântica adequada, labels e mensagens de erro associadas aos campos;
-- alternativas textuais para imagens relevantes;
-- contraste legível e estados não dependentes apenas de cor;
-- feedback acessível para mutations e alterações em tempo real;
-- ausência de overflow horizontal indevido e perda de conteúdo com zoom.
+Consulte [`ARCHITECTURE.md`](./ARCHITECTURE.md) para contratos, política de sessão/cache, reconciliação REST↔Socket.IO e limitações dos mocks.
 
-Use os assets do arquivo quando disponíveis e mantenha imagens e fontes necessárias acessíveis à execução local. Documente qualquer substituição de asset ou ajuste de acessibilidade em relação ao layout.
+---
 
-## 9. Testes com Playwright
+## Branches e Workflow Git
 
-Entregue testes E2E executáveis com os mocks, cobrindo:
+```
+main      → produção (build estático; nunca push direto)
+homolog   → validação/release de PRs (staging)
+develop   → integração diária (merges das branches feat/*)
+feature   → feat/<assunto> + PR para develop (boas práticas de código limpo)
+```
 
-1. Busca, filtros combinados, ordenação, paginação e restauração pelo histórico.
-2. Acesso direto ao detalhe e tratamento de recurso inexistente.
-3. Cadastro, login, expiração de sessão, logout e troca de usuário.
-4. Favoritos, incluindo falha de mutation e recuperação do estado.
-5. Carrinho, quantidades, remoção, cupom e persistência após refresh/login.
-6. Compra completa, do catálogo ao recibo confirmado.
-7. Falha de pagamento, clique repetido e timeout com recuperação do mesmo pedido.
-8. Edição de perfil, avatar, senha e carteiras, com erros de validação.
-9. Alteração de preço/disponibilidade via Socket.IO durante o checkout.
-10. Eventos duplicados ou antigos, desconexão e retomada de pedido pendente.
-11. Navegação por teclado, foco de diálogos e validação de formulários.
-12. Skeletons durante carregamento lento, feedback de falha e recuperação após nova tentativa.
+**Commits:** `feat:`, `fix:`, `test:`, `docs:`, `design:`, `ops:`, `backend:` (conventional commits)  
+**PRs:** sempre via pull request template; revisados e mergeados por milestone  
+**main:** protegida — merge somente via PR de `homolog`
 
-Execute os fluxos principais em Chromium, nos viewports desktop e mobile. Inclua regressão visual de início, detalhe, carrinho e pagamento, com baselines versionadas e dados estáveis.
+As branches `main`, `homolog` e `develop` possuem proteção com checks obrigatórios (`typecheck`, `lint`, `test:e2e`).
 
-Cada teste deve partir de um estado isolado. Controle relógio, latência e disparo dos eventos nos cenários sensíveis a tempo. Entregue relatório HTML e traces das falhas.
+---
 
-As verificações devem observar a interface e os resultados das operações. Os testes de tempo real precisam passar pelo cliente Socket.IO e os de REST pelos handlers MSW.
+## Assets e Otimização
 
-## 10. Performance e Lighthouse
+- **4 artes reais** extraídas do Figma (PNG 1254×1254) → `design/assets/` → convertidas para WebP (640 e 1280) via `npm run images:optimize` (~95% redução).
+- **Ícones via React Icons** (`react-icons@5.7.0`, já usado no `App.tsx`) → import de `react-icons/fa`, `react-icons/fc`, etc. Os 113 SVGs de `public/icons/` foram removidos por não serem referenciados em nenhum ponto do app (só `google.svg` e `facebook.svg` eram usados, agora substituídos por `FcGoogle` e `FaFacebookF`).
+- **Specs por tela** (posições, tamanhos, textos, cores) → `design/screens/`.
+- Tokens de design (fonte, paleta, tamanhos) → `design/README.md`.
+- Fontes self-hosted: **Inter** + **Roboto Mono** como woff2 variáveis em `public/fonts/`, apenas subsets `latin`/`latin-ext` (o app usa pt-BR/en/es — cyrillic/greek/vietnamese moravam no CSS sem uso), carregadas por `src/styles/fonts.css` com `font-display: swap`. Zero requests ao Google Fonts.
 
-Audite início e detalhe do NFT com Lighthouse em perfis mobile e desktop, usando build otimizado e o cenário padrão dos mocks.
+---
 
-| Categoria | Meta |
-| --- | ---: |
-| Performance | ≥ 90 |
-| Accessibility | ≥ 95 |
-| Best Practices | ≥ 95 |
-| SEO | ≥ 90 |
+## Acessibilidade (WCAG 2.1 AA)
 
-Execute três medições por página e perfil e reporte a mediana de cada categoria. Versione a configuração da auditoria e entregue relatórios HTML/JSON, versões das ferramentas, ambiente e condições de execução.
+- Navegação por teclado e foco visível (`focus-visible:ring`) em todos os controles.
+- Semântica adequada (`header/nav/main/footer`, `fieldset/legend`, `aria-label`, `aria-invalid`).
+- Alternativas textuais em imagens relevantes; ícones decorativos com `aria-hidden`.
+- Contraste legível; nenhum estado depende só de cor.
+- Skeletons preservam dimensões (evita layout shift); respeita `prefers-reduced-motion`.
+- Sem overflow horizontal indevido; sem perda de conteúdo com zoom até 200%.
+- Alvos de toque ≥ 24 px (sliders duplos do filtro de preço medidos com Lighthouse `target-size`: estavam com 21 px).
 
-Registre LCP, CLS e TBT. Justifique resultados abaixo das metas e identifique as causas. A auditoria deve carregar as imagens, fontes e funcionalidades da entrega, sem simplificações exclusivas para melhorar a pontuação.
+---
 
-## 11. Critérios de avaliação
+## Performance
 
-| Critério | Pontos | Evidência esperada |
-| --- | ---: | --- |
-| Fidelidade visual e responsividade | 20 | Aderência ao Figma e consistência entre tamanhos de tela |
-| Fluxos e experiência de uso | 20 | Compra e conta completas, validações e recuperação de erros |
-| Integração e estado | 15 | Router, Query, Axios, contratos e cache coerentes |
-| Tempo real | 10 | Eventos, reconexão, ordenação e sincronização com REST |
-| Mocking | 10 | MSW, cenários determinísticos, persistência e reset |
-| Testes | 10 | Cobertura dos fluxos e falhas com Playwright |
-| Acessibilidade | 5 | Operação por teclado, semântica, foco e feedback |
-| Performance | 5 | Resultados e análise das auditorias Lighthouse |
-| Arquitetura e documentação | 5 | Tipagem, responsabilidades e execução reproduzível |
-| **Total** | **100** | |
+Metas alcançadas e verificadas com Lighthouse CI local (`lighthouserc*.cjs` — 3 execuções por página por perfil, mediana):
 
-São eliminatórios: ausência de uso efetivo da stack obrigatória, fluxos principais apenas visuais, compra confirmada sem resposta da simulação, exposição de dados entre usuários, eventos simulados diretamente na UI ou ausência de testes E2E executáveis.
+| Página | Mobile | Desktop |
+| --- | --- | --- |
+| Home | P **91** · A11y **100** · BP **100** · SEO **100** (FCP 2,26 s · LCP 3,12 s · TBT 87 ms · CLS 0,001) | P **99** · A11y **100** · BP **100** · SEO **100** (FCP 618 ms · LCP 829 ms) |
+| Detalhe do NFT | P **90** · A11y **100** · BP **100** · SEO **100** | P **95** · A11y **100** · BP **100** · SEO **100** |
 
-## 12. Entrega
+O que entrou na rodada:
 
-Entregue código-fonte, lockfile, assets, mocks, fixtures, testes e configurações de auditoria.
+- **Fontes self-hosted + corte de subsets** — o Google Fonts dominava o boot no mobile; as 13 woff2 vieram para `public/fonts/` e os 58 blocos `@font-face` viraram 18 (`latin`/`latin-ext`). CSS de ~83 kB → ~74 kB.
+- **Imagens** — `width`/`height` explícitos (home, catálogo, detalhe) e `loading="lazy"` na arte do hero desktop, que no mobile era baixada (84 kB) escondida.
+- **SEO** — `public/robots.txt` + `public/sitemap.xml` (o rewrite SPA devolvia o `index.html` nessas URLs: 24 erros de sintaxe; SEO 92 → 100).
+- **A11y** — slider duplo de preço com alvo de toque ≥ 24 px (`target-size`), skeletons com shimmer respeitando `prefers-reduced-motion`.
 
-O **deploy é obrigatório**. Envie o link do repositório e uma URL pública da aplicação. Recomenda-se [Vercel](https://vercel.com/docs/frameworks/frontend/vite); [Netlify](https://docs.netlify.com/build/frameworks/framework-setup-guides/vite/) e [Cloudflare Pages](https://developers.cloudflare.com/pages/framework-guides/deploy-a-react-site/) também são aceitos.
+Duas tentativas que **descartei** depois de medir ambas com Lighthouse, em vez de chutar (detalhes na seção de decisões):
 
-A versão publicada deve corresponder ao código entregue e permanecer acessível durante a avaliação, com os mocks e os fluxos de tempo real funcionando. Acesso direto e refresh das rotas devem funcionar no ambiente publicado.
+- Paralelizar o `bootstrap` (`Promise.all` do MSW com os imports do router) — mobile caiu de 91 → 80.
+- Preload do LCP com `media="(max-width: 767px)"` — FCP melhorou, mas LCP piorou, net −1 ponto.
 
-O `README.md` da solução deve conter setup, variáveis de ambiente, credenciais fictícias, seleção e reset dos cenários, comandos de execução e instruções para reproduzir os fluxos de falha.
+Sobra, aceito: `unused-javascript` e `bf-cache` (~300 ms — inerentes ao build de demonstração, que serve os mocks do MSW em produção) e `uses-responsive-images` (~70 ms — só existem variantes 640/1280 das artes).
 
-Documente os contratos REST e eventos, a política de sessão, o estado do carrinho, a estratégia de cache e a reconciliação entre REST e Socket.IO. Registre limitações, decisões de UX e eventuais desvios do Figma em `ARCHITECTURE.md`.
+---
 
-Disponibilize comandos para desenvolvimento com mocks, build, preview, verificação de tipos, lint, testes Playwright e auditoria Lighthouse.
+## Registro de Decisões e Raciocínio
 
-A entrega deve executar a partir de um checkout limpo, sem depender de serviços privados ou do backend de produção.
+Escrevi esta seção para deixar registrado não só **o que** foi feito, mas **como eu cheguei** em cada decisão — o que observei, o que testei e o que concluí. O objetivo é que quem ler o código depois consiga refazer o mesmo caminho.
+
+### CI: por que os jobs se chamam `typecheck`, `lint` e `test:e2e`
+
+Ao configurar a proteção de `main`, o GitHub passou a exigir *checks* obrigatórios antes do merge. O detalhe que me chamou atenção: o nome registrado pelo GitHub vem do **nome do job**, então um job chamado `testes e2e` nunca ia casar com o context `test:e2e` e o PR ficaria permanentemente bloqueado. Por isso nomeei os jobs exatamente igual aos contexts exigidos.
+
+Também separei a instalação do Chromium em um job dedicado, com cache da pasta de browsers. Medi o tempo: rodar `playwright install` do zero em toda execução era o que mais pesava no pipeline, e era a causa mais comum de timeout em CI.
+
+### Deploy: os 404 da Vercel vieram do modo de build errado
+
+Ao publicar, toda chamada a `/api/*` retornava 404 e o console mostrava falha de rede. Em vez de tratar o sintoma, fui verificar como os mocks eram ligados: em `src/lib/env.ts`, `enableMocks` só é verdadeiro quando `mode === 'demonstration'`.
+
+Concluí o raciocínio: sem configuração, a Vercel usa `npm run build`, que roda em modo `production` → o MSW nunca registra o worker → as requisições saem para a rede e batem no host estático, que não tem backend nenhum atrás.
+
+A correção foi declarar `vercel.json` com `buildCommand: npm run build:demo` e um rewrite de SPA (`/(.*)` → `/index.html`), necessário para acesso direto e *refresh* das rotas.
+
+### Testes E2E: os 3 casos de falha eram de seletor, não de app
+
+Antes de mexer em qualquer linha de código, preferi ver o que o navegador realmente renderizava: despejei o DOM em um script temporário e comparei com o que os testes procuravam. O diagnóstico:
+
+- `getByLabel("E-mail")` casava com dois elementos — o campo de login e o *input* de newsletter do footer. Restringi ao formulário e usei `{ exact: true }`.
+- Existiam dois botões "Entrar": o do header (`type=button`, abre modal) e o `type=submit` do formulário. Escopiei a busca para dentro do `<form>`.
+- Os cards apontam para `/mercado/nft/001` (com barra), não `/mercado/nft-001` nem `/nfts/`.
+
+Como o teste é que estava desatualizado em relação à UI, corrigi apenas os seletores — nenhuma linha do app precisou mudar.
+
+### Ícones: auditei antes de deletar
+
+Antes de remover `public/icons`, varri o repo inteiro (TSX, CSS, HTML e construção dinâmica de caminhos) procurando qualquer referência a `/icons/`. O resultado foi literal: **2 usos**, `google.svg` e `facebook.svg`. Os outros 111 arquivos não eram servidos em lugar nenhum.
+
+Como `react-icons` já era dependência e já era usado no `App.tsx`, troquei os dois `<img>` por `FcGoogle` e `FaFacebookF` (mantive o tom cobre `text-kurio-copper` para preservar a identidade visual) e removi os 113 SVGs. Ganho: 113 arquivos a menos publicados e um padrão de ícone consistente no projeto inteiro.
+
+### Footer duplicado
+
+O footer aparecia duas vezes na home. Encontrei `<KurioFooter />` tanto em `__root.tsx` (layout raiz, aplicado a todas as rotas) quanto em `index.tsx`. Como o root já garante o rodapé em toda tela, removi o da home — agora todas as rotas têm exatamente um.
+
+### O botão de carrinho do card navegava em vez de adicionar
+
+Clicando no ícone de carrinho de um card, a página recarregava em `/nfts/...` em vez de adicionar o item. O código do botão era `event.preventDefault()` seguido de `window.location.assign(...)` — dois problemas no mesmo lugar: não havia chamada alguma ao carrinho, e o `assign` derrubava o SPA inteiro.
+
+Substituí por uma mutação (`cartApi.addItem`). O ponto que me economizou uma requisição: o DTO da lista já traz `editions[]`, então uso a primeira edição disponível direto do card — não preciso buscar o detalhe para saber qual `editionId` enviar. Como o card inteiro é um `<Link>`, o handler também chama `stopPropagation()`, senão o clique ainda navegaria.
+
+Quase deixei um bug novo no caminho: o `<Toaster />` do `sonner` estava montado em `App.tsx`, arquivo que nem é o shell da aplicação — o app sobe por `main.tsx` → `AppProviders` → `RouterProvider`. Movi o `Toaster` para `AppProviders` e o feedback de sucesso passou a existir de fato.
+
+### Footer: reconstruído a partir do arquivo do Figma
+
+O rodapé não batia com o design. Em vez de comparar "olhando", extraí do `.fig` a árvore de nodes do componente `Footer` com posição e tamanho de cada elemento, e três conclusões mudaram o código:
+
+- O "W C D" não era um selo de texto no bloco da newsletter (como eu havia escrito). Eram **três service marks separadas**, cada uma num quadrado de 74×74 acima da sua feature: `W` em "Segurança da carteira", `C` em "Criadores em destaque", `D` em "Alertas de lançamentos".
+- A newsletter não era uma seção à parte acima das features: era a **4ª coluna da mesma faixa**, com a descrição *abaixo* do formulário.
+- KURIO, tagline, e-mail e telefone ficam em **uma linha de 4 colunas**; e "Redes sociais" + "Carteiras compatíveis" formam a 4ª coluna das colunas de links, não uma barra embaixo.
+
+Li também `textAlignHorizontal` dos nodes: o título e a descrição do "Diário da Cunhagem" vêm como `CENTER` no Figma (assim como o copyright), então centralizei os dois.
+
+### Guarda de rotas e atualização otimista: dois requisitos que estavam só no papel
+
+O §4 do enunciado pede proteção dos fluxos privados e "atualização otimista em pelo menos uma interação, com rollback". Auditando o código:
+
+- `requireAuthBeforeLoad` existia em `features/auth/require-auth.ts`, mas **não era importado por nenhuma rota** — código morto. Só o `/checkout` estava protegido, por um componente `RequireAuth` que redireciona *depois* de montar (spinner + `navigate` no `useEffect`). Liguei `beforeLoad: requireAuthBeforeLoad` em `checkout`, `favorites`, `orders.$orderId`, `account.profile` e `account.wallets`, e fiz a guarda preservar `?redirect=` para retomar o fluxo após o login. O `ARCHITECTURE.md` §4 já descrevia esse comportamento; agora é o código que obedece ao documento.
+- A mutação de favoritos tinha só `onSuccess` com invalidação — servidor manda, interface espera. Reescrevi com o ciclo completo: `onMutate` cancela os refetches em andamento, fotografa o cache e aplica a mudança localmente; `onError` devolve o snapshot anterior (rollback); `onSettled` revalida. O carrinho seguiu com invalidação clássica de propósito: preço, disponibilidade e total são decididos pelo servidor.
+
+### `/mercado/nft/001` renderizava o catálogo inteiro: faltava um `<Outlet />` na rota pai
+
+Acessando direto o detalhe de um NFT, o MarketplacePage inteiro aparecia por cima da arte. Quando uma rota tem filhos, o pai precisa renderizar o `<Outlet />` — sem ele, quem fica na tela é o layout do pai (no caso, a própria página do marketplace) e a rota filha nem chega a montar. Refatorei `mercado.tsx` para um layout transparente (`component: () => <Outlet />`) e movi a página real para `mercado.index.tsx` (`createFileRoute('/mercado/')`). O `routeTree.gen.ts` foi regenerado — desta vez com diff real, não só mudança de EOL.
+
+### Performance: o que descartei depois de medir
+
+Duas mudanças pareciam ganho óbvio e saíram da rodada porque medi o antes/depois com Lighthouse e o resultado foi o inverso do esperado:
+
+- **Paralelizar o bootstrap.** `await enableMocking()` em sequência com os imports do router parecia um gargalo — juntei tudo num `Promise.all`: mobile caiu de 91 → 80 e o LCP passou a carregar com "Render Delay" de 3,9 s. No modelo de rede simulada do Lighthouse, os downloads que passaram a competir atrasaram o app em vez de ajudar. Revertido — o `await` em sequência continua garantindo que o primeiro fetch já encontre o mock no ar.
+- **Preload do LCP com `media="(max-width: 767px)"`.** FCP melhorou (2250 → 2092 ms), mas o LCP piorou (3109 → 3251 ms) porque a imagem preloadada disputava o caminho crítico com CSS/JS de um jeito que atrasava a renderização do hero. Net −1 ponto; sem o preload o browser já dispara a imagem cedo no mobile.
+
+Ficaram: fontes self-hosted com subsets cortados, `width`/`height` + `loading="lazy"` nas imagens, `robots.txt`/`sitemap.xml`, e o slider com alvo ≥ 24 px.
+
+### Validação
+
+Rodo sempre a mesma bateria que o CI, nas mesmas condições (`CI=1`, `workers=1`, `retries=2`): `typecheck`, `lint`, `build:demo` e `test:e2e`. É a única forma de ter certeza de que o que passa localmente vai passar no GitHub.
+
+---
+
+## Documentação Complementar
+
+- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — contratos REST, eventos, sessão, carrinho, cache, mocks, limitações, desvios do Figma.
+- [`docs/ENUNCIADO.md`](./docs/ENUNCIADO.md) — enunciado completo do desafio.
+- `design/README.md` — tokens de design extraídos do Figma.
+- `design/screens/*.json` — specs por tela (desktop/mobile).

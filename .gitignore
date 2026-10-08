@@ -1,0 +1,48 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+
+design/
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Testes e auditorias
+playwright-report
+test-results
+lighthouse-reports
+lighthouseci
+.lighthouseci
+blob-report
+.cache
+
+# Caches de ferramentas
+.tanstack
+.vite
+*.tsbuildinfo
+
+# Design fonte (arquivo de trabalho do Figma, ~9,5 MB — o link está no README)
+*.fig
+
+# Ambiente
+.env
+.env.*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
