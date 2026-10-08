@@ -19,8 +19,18 @@ dist-ssr
 playwright-report
 test-results
 lighthouse-reports
+lighthouseci
+.lighthouseci
 blob-report
 .cache
+
+# Caches de ferramentas
+.tanstack
+.vite
+*.tsbuildinfo
+
+# Design fonte (arquivo de trabalho do Figma, ~9,5 MB — o link está no README)
+*.fig
 
 # Ambiente
 .env

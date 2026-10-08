@@ -3,8 +3,10 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { favoritesApi, nftsApi, queryKeys } from '@/api'
 import { formatEth } from '@/lib/decimal'
+import { requireAuthBeforeLoad } from '@/features/auth/require-auth'
 
 export const Route = createFileRoute('/favorites')({
+  beforeLoad: requireAuthBeforeLoad,
   component: FavoritesPage,
 })
 

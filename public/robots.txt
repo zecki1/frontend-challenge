@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://frontend-challenge-indol-zeta.vercel.app/sitemap.xml

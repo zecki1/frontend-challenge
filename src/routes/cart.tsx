@@ -60,10 +60,10 @@ function CartPage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-content px-4 py-10 sm:px-6">
-        <div className="h-8 w-48 animate-pulse rounded bg-kurio-surface motion-reduce:animate-none" />
+        <div className="h-8 w-48 skeleton rounded bg-kurio-surface" />
         <div className="mt-8 space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 animate-pulse rounded-lg bg-kurio-surface motion-reduce:animate-none" />
+            <div key={i} className="h-24 skeleton rounded-lg bg-kurio-surface" />
           ))}
         </div>
       </div>

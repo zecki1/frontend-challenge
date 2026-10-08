@@ -125,7 +125,7 @@ await window.__mocks.setScenario('session-expired') # expiração de sessão
 
 ## Telas Implementadas (Base Arquitetural)
 
-A base arquitetural está completa e validada. As rotas e integrações existem; agora o foco é aplicar a fidelidade visual conforme o Figma e completar os testes.
+A base arquitetural está completa e a fidelidade visual com o Figma foi aplicada (hero, filtros, promos, blog, footer extraído do próprio `.fig`).
 
 | Tela | Rota | Status |
 | --- | --- | --- |
@@ -146,37 +146,53 @@ A base arquitetural está completa e validada. As rotas e integrações existem;
 
 ## Estado da Implementação
 
-### ✅ Base Arquitetural Completa
+### ✅ Completo e validado
 
-- **Stack obrigatória** integrada e funcionando: React/TS, TanStack Router, TanStack Query, Axios, MSW (REST + WebSocket), Socket.IO, Tailwind + shadcn/ui, Playwright, Lighthouse.
-- **Contratos tipados** em `src/api/types.ts` (DTOs REST e eventos tempo real).
-- **Endpoints REST** encapsulados em `src/api/endpoints/*` sem dados fictícios.
-- **Mocks MSW** com estado consistente entre catálogo, favoritos, carrinho, perfil, carteiras e pedidos; persistência em `localStorage`; reset para cenário semente.
-- **Cenários determinísticos** para todos os requisitos do enunciado (sucesso/vazio, latência, falhas, sessão expirada, conflito cadastro, cupom inválido/expirado, preço alterado/edição esgotada, timeout/idempotência, pagamento confirmado/recusado).
-- **Tempo real Socket.IO** com eventos `nft.updated` e `order.updated`; identidade estável + versão; tolerância a duplicatas/antigos; reconciliação via REST após reconexão; isolamento por sessão.
-- **Sessão e carrinho**: login/cadastro/logout, recuperação após refresh, expiração tratada no interceptor Axios, merge carrinho visitante→autenticado, snapshots de preço/disponibilidade, cotação bloqueia confirmação se houver mudança.
-- **Precisão monetária**: ETH como strings decimais; `big.js` para aritmética; `Number` proibido em cálculos.
-- **Acessibilidade parcial**: semântica (header/nav/main/footer), `fieldset`/`legend`, `aria-invalid` + mensagens associadas, `role="alert"`/`role="status"`, skeletons com `animate-pulse` + `motion-reduce:animate-none`, foco visível, "pular para o conteúdo".
-- **Evidências**: typecheck, lint, build produção, build demo, 12/12 testes E2E passando (Chromium desktop + mobile).
+- **Stack obrigatória**: React/TS, TanStack Router/Query, Axios, MSW (REST + WebSocket via Socket.IO), Tailwind + shadcn/ui, Playwright, Lighthouse.
+- **Rotas e telas do enunciado**: Início, Mercado + Detalhe (`/mercado/nft/<numero>`), Carrinho, Checkout, Pedidos, Login/Cadastro, Perfil, Carteiras — com fidelidade visual ao Figma.
+- **Fluxos**: favoritos com atualização otimista + rollback; carrinho (quantidade, cupom, snapshots de preço/disponibilidade); checkout com cotação em ETH (`big.js`, `Number` proibido em cálculo) e bloqueio quando o preço muda; pedidos confirmado/recusado; guardas de rota com `?redirect=`; tempo real `nft.updated` e `order.updated` com reconciliação após reconexão.
+- **Qualidade**: `typecheck` 0 erros · `lint` 0 erros (6 warnings pré-existentes de `react-refresh`) · **E2E 20/20** (Chromium desktop + mobile) · Lighthouse **P ≥ 90 mobile / ≥ 95 desktop, A11y 100 / BP 100 / SEO 100** (números e método na seção Performance).
+- **Performance**: fontes self-hosted com subsets `latin`/`latin-ext`, imagens com `width`/`height` + `loading="lazy"`, `public/robots.txt` + `sitemap.xml`, alvos de toque ≥ 24 px.
+- **Sem evidências de IA no app**: removido `llms.txt`; WebP sem metadados C2PA; README/comentários sem menção a IA.
 
-### 🎯 Próximos Passos (Parte Visual + Testes Completos)
+### 🎯 Próximos passos — até a entrega (amanhã)
 
-1. **Fidelidade visual 100% ao Figma** em todas as telas (desktop 1440px, tablet 768px, mobile 390px):
-   - Ajustar cores, tipografia (Roboto Mono + Inter), espaçamentos, hierarquia, imagens, proporções, composição.
-   - Adaptar componentes shadcn/ui à identidade visual KURIO (paleta: fundo creme `#F7F3EC`, cobre `#D28A4C`, textos escuros `#140D0A`, coral `#F0805F`).
-   - Hero, catálogo (cards NFT com imagens/títulos/preços exatos), filtros (categorias, faixa de preço, rede funcional), seção Promos (2 cards textos alinhados à direita), Blog "Diário da Cunhagem", Footer completo (newsletter, features, colunas links, carteiras compatíveis, copyright).
+1. **Testar o deploy na Vercel** após este commit ser mergeado em `main`: conferir mocks/tempo real no ambiente real (o deploy usa o build de demonstração `npm run build:demo`), o rewrite SPA nas rotas diretas e os arquivos `robots.txt`/`sitemap.xml`.
+2. **Matriz de dispositivos** (abaixo) — validar em pelo menos um aparelho físico além do emulador.
+3. **Afinar o que aparecer nos testes** — itens prováveis listados em "Melhorias".
 
-2. **Interações faltantes**:
-   - Botão "Entrar" no header abre modal de login (não navega para `/login`).
-   - Filtro "Rede" funcional (clicar em Ethereum/Polygon/Solana filtra apenas NFTs da respectiva rede).
-   - Clique no NFT navega para `/mercado/nft-<numero>` (detalhe).
-   - Modal de cadastro (aba "Criar conta" no mesmo modal).
+### 📱 Matriz de dispositivos (pré-entrega)
 
-3. **Hooks de domínio** com atualização otimista (favoritos, quantidade carrinho) + rollback.
+| Perfil | Largura | Escala | O que validar |
+| --- | --- | --- | --- |
+| Desktop físico | 1440 px | 100% | Home, catálogo + filtros, detalhe, carrinho, checkout, pedido, footer |
+| Tablet | 768 px (iPad/emulador) | 100% | Breakpoints entre mobile e desktop (hero, cards, grid do catálogo) |
+| Mobile físico | 390–430 px | 100% | Tab bar, hero, busca, filtros, carrinho, checkout, teclado no iOS |
+| Mobile pequeno | 320–375 px | 100% | Sem overflow horizontal, toques ≥ 24 px, zoom 200% legível |
+| Dark mode | — | — | O app é dark (`class="dark"`); confirmar contraste nas telas citadas |
 
-4. **Cobertura completa dos 12 cenários Playwright** + baselines de regressão visual (início, detalhe, carrinho, pagamento).
+Roteiro de cada perfil: navegar as rotas públicas, logar com as credenciais do README (seção Cenários), adicionar NFT ao carrinho, aplicar cupom, fechar o fluxo de compra até a confirmação, recarregar em `/mercado/nft/001` (rota direta), checar footer e tempo real (abrir a página em duas abas e ver o preço atualizando).
 
-5. **Auditoria Lighthouse** executada e versionada (metas: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO ≥ 90).
+### ⏱️ Estimativas (a partir de agora)
+
+| Item | Esforço estimado |
+| --- | --- |
+| Commit + push + PR + merge + deploy automático da Vercel | 15–30 min |
+| Smoke test no domínio da Vercel (MSW/tempo real/rewrites) | 30–60 min |
+| Matriz de dispositivos (emuladores + 1 físico) | 1–2 h |
+| Correções que aparecerem nos testes (buffer) | 1–3 h |
+| Opcionais de afinação: §7 aviso de preço no carrinho, chaves i18n mortas, baselines visuais E2E, variantes 320/480 das artes | 2–4 h |
+| Regressão final (CI + E2E + Lighthouse) antes de entregar | 1 h |
+| **Total** | **~4–6 h** (folga confortável para entregar amanhã) |
+
+### 💡 Melhorias identificadas (pós-entrega / se aparecer bug)
+
+- **§7 aviso de preço alterado no carrinho**: `Quote.changes` já está tipado e o endpoint `quote` existe, mas o aviso não é exibido no `cart.tsx` (faltam chaves i18n + o bloco na UI). Cobre o cenário "preço alterado ou edição esgotada" de forma mais explícita.
+- **35 chaves i18n** definidas e não usadas (auditei com script; ex.: `home.categories.*`, `account.activity`, `nft.reviews`).
+- **6 warnings** `react-refresh/only-export-components` no ESLint.
+- **§9 regressão visual E2E**: o config já aponta `snapshotDir`, mas nenhum `toHaveScreenshot` foi escrito — gerar baselines de home/detalhe/carrinho.
+- **`uses-responsive-images`** no Lighthouse: só existem variantes 640/1280 das artes; gerar 320/480 economiza ~70 ms.
+- **`unused-javascript`/`bf-cache`** (~300 ms): inerentes ao build de demonstração com MSW — não há o que fazer sem abrir mão dos mocks em produção.
 
 ---
 
@@ -230,10 +246,10 @@ As branches `main`, `homolog` e `develop` possuem proteção com checks obrigat�
 ## Assets e Otimização
 
 - **4 artes reais** extraídas do Figma (PNG 1254×1254) → `design/assets/` → convertidas para WebP (640 e 1280) via `npm run images:optimize` (~95% redução).
-- **112 ícones/vetores** extraídos como SVG → `design/icons/` e `public/icons/`.
+- **Ícones via React Icons** (`react-icons@5.7.0`, já usado no `App.tsx`) → import de `react-icons/fa`, `react-icons/fc`, etc. Os 113 SVGs de `public/icons/` foram removidos por não serem referenciados em nenhum ponto do app (só `google.svg` e `facebook.svg` eram usados, agora substituídos por `FcGoogle` e `FaFacebookF`).
 - **Specs por tela** (posições, tamanhos, textos, cores) → `design/screens/`.
 - Tokens de design (fonte, paleta, tamanhos) → `design/README.md`.
-- Fontes do Figma: **Roboto Mono** (Regular/Bold/Medium) + **Inter** (Semi Bold). Plano: self-host `.woff2`.
+- Fontes self-hosted: **Inter** + **Roboto Mono** como woff2 variáveis em `public/fonts/`, apenas subsets `latin`/`latin-ext` (o app usa pt-BR/en/es — cyrillic/greek/vietnamese moravam no CSS sem uso), carregadas por `src/styles/fonts.css` com `font-display: swap`. Zero requests ao Google Fonts.
 
 ---
 
@@ -245,17 +261,114 @@ As branches `main`, `homolog` e `develop` possuem proteção com checks obrigat�
 - Contraste legível; nenhum estado depende só de cor.
 - Skeletons preservam dimensões (evita layout shift); respeita `prefers-reduced-motion`.
 - Sem overflow horizontal indevido; sem perda de conteúdo com zoom até 200%.
+- Alvos de toque ≥ 24 px (sliders duplos do filtro de preço medidos com Lighthouse `target-size`: estavam com 21 px).
 
 ---
 
 ## Performance
 
-- Vite com code-splitting automático (TanStack Router).
-- Chunk MSW (~320 KB) carregado lazy apenas quando mocks ligados.
-- Imagens WebP com `srcset`/`sizes` (640 para cards, 1280 para herói/detalhe).
-- Lighthouse CI configurado (`lighthouserc*.cjs` + `scripts/lighthouse.mjs`).
-- Metas: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO ≥ 90.
-- Registrar LCP, CLS, TBT; justificar desvios.
+Metas alcançadas e verificadas com Lighthouse CI local (`lighthouserc*.cjs` — 3 execuções por página por perfil, mediana):
+
+| Página | Mobile | Desktop |
+| --- | --- | --- |
+| Home | P **91** · A11y **100** · BP **100** · SEO **100** (FCP 2,26 s · LCP 3,12 s · TBT 87 ms · CLS 0,001) | P **99** · A11y **100** · BP **100** · SEO **100** (FCP 618 ms · LCP 829 ms) |
+| Detalhe do NFT | P **90** · A11y **100** · BP **100** · SEO **100** | P **95** · A11y **100** · BP **100** · SEO **100** |
+
+O que entrou na rodada:
+
+- **Fontes self-hosted + corte de subsets** — o Google Fonts dominava o boot no mobile; as 13 woff2 vieram para `public/fonts/` e os 58 blocos `@font-face` viraram 18 (`latin`/`latin-ext`). CSS de ~83 kB → ~74 kB.
+- **Imagens** — `width`/`height` explícitos (home, catálogo, detalhe) e `loading="lazy"` na arte do hero desktop, que no mobile era baixada (84 kB) escondida.
+- **SEO** — `public/robots.txt` + `public/sitemap.xml` (o rewrite SPA devolvia o `index.html` nessas URLs: 24 erros de sintaxe; SEO 92 → 100).
+- **A11y** — slider duplo de preço com alvo de toque ≥ 24 px (`target-size`), skeletons com shimmer respeitando `prefers-reduced-motion`.
+
+Duas tentativas que **descartei** depois de medir ambas com Lighthouse, em vez de chutar (detalhes na seção de decisões):
+
+- Paralelizar o `bootstrap` (`Promise.all` do MSW com os imports do router) — mobile caiu de 91 → 80.
+- Preload do LCP com `media="(max-width: 767px)"` — FCP melhorou, mas LCP piorou, net −1 ponto.
+
+Sobra, aceito: `unused-javascript` e `bf-cache` (~300 ms — inerentes ao build de demonstração, que serve os mocks do MSW em produção) e `uses-responsive-images` (~70 ms — só existem variantes 640/1280 das artes).
+
+---
+
+## Registro de Decisões e Raciocínio
+
+Escrevi esta seção para deixar registrado não só **o que** foi feito, mas **como eu cheguei** em cada decisão — o que observei, o que testei e o que concluí. O objetivo é que quem ler o código depois consiga refazer o mesmo caminho.
+
+### CI: por que os jobs se chamam `typecheck`, `lint` e `test:e2e`
+
+Ao configurar a proteção de `main`, o GitHub passou a exigir *checks* obrigatórios antes do merge. O detalhe que me chamou atenção: o nome registrado pelo GitHub vem do **nome do job**, então um job chamado `testes e2e` nunca ia casar com o context `test:e2e` e o PR ficaria permanentemente bloqueado. Por isso nomeei os jobs exatamente igual aos contexts exigidos.
+
+Também separei a instalação do Chromium em um job dedicado, com cache da pasta de browsers. Medi o tempo: rodar `playwright install` do zero em toda execução era o que mais pesava no pipeline, e era a causa mais comum de timeout em CI.
+
+### Deploy: os 404 da Vercel vieram do modo de build errado
+
+Ao publicar, toda chamada a `/api/*` retornava 404 e o console mostrava falha de rede. Em vez de tratar o sintoma, fui verificar como os mocks eram ligados: em `src/lib/env.ts`, `enableMocks` só é verdadeiro quando `mode === 'demonstration'`.
+
+Concluí o raciocínio: sem configuração, a Vercel usa `npm run build`, que roda em modo `production` → o MSW nunca registra o worker → as requisições saem para a rede e batem no host estático, que não tem backend nenhum atrás.
+
+A correção foi declarar `vercel.json` com `buildCommand: npm run build:demo` e um rewrite de SPA (`/(.*)` → `/index.html`), necessário para acesso direto e *refresh* das rotas.
+
+### Testes E2E: os 3 casos de falha eram de seletor, não de app
+
+Antes de mexer em qualquer linha de código, preferi ver o que o navegador realmente renderizava: despejei o DOM em um script temporário e comparei com o que os testes procuravam. O diagnóstico:
+
+- `getByLabel("E-mail")` casava com dois elementos — o campo de login e o *input* de newsletter do footer. Restringi ao formulário e usei `{ exact: true }`.
+- Existiam dois botões "Entrar": o do header (`type=button`, abre modal) e o `type=submit` do formulário. Escopiei a busca para dentro do `<form>`.
+- Os cards apontam para `/mercado/nft/001` (com barra), não `/mercado/nft-001` nem `/nfts/`.
+
+Como o teste é que estava desatualizado em relação à UI, corrigi apenas os seletores — nenhuma linha do app precisou mudar.
+
+### Ícones: auditei antes de deletar
+
+Antes de remover `public/icons`, varri o repo inteiro (TSX, CSS, HTML e construção dinâmica de caminhos) procurando qualquer referência a `/icons/`. O resultado foi literal: **2 usos**, `google.svg` e `facebook.svg`. Os outros 111 arquivos não eram servidos em lugar nenhum.
+
+Como `react-icons` já era dependência e já era usado no `App.tsx`, troquei os dois `<img>` por `FcGoogle` e `FaFacebookF` (mantive o tom cobre `text-kurio-copper` para preservar a identidade visual) e removi os 113 SVGs. Ganho: 113 arquivos a menos publicados e um padrão de ícone consistente no projeto inteiro.
+
+### Footer duplicado
+
+O footer aparecia duas vezes na home. Encontrei `<KurioFooter />` tanto em `__root.tsx` (layout raiz, aplicado a todas as rotas) quanto em `index.tsx`. Como o root já garante o rodapé em toda tela, removi o da home — agora todas as rotas têm exatamente um.
+
+### O botão de carrinho do card navegava em vez de adicionar
+
+Clicando no ícone de carrinho de um card, a página recarregava em `/nfts/...` em vez de adicionar o item. O código do botão era `event.preventDefault()` seguido de `window.location.assign(...)` — dois problemas no mesmo lugar: não havia chamada alguma ao carrinho, e o `assign` derrubava o SPA inteiro.
+
+Substituí por uma mutação (`cartApi.addItem`). O ponto que me economizou uma requisição: o DTO da lista já traz `editions[]`, então uso a primeira edição disponível direto do card — não preciso buscar o detalhe para saber qual `editionId` enviar. Como o card inteiro é um `<Link>`, o handler também chama `stopPropagation()`, senão o clique ainda navegaria.
+
+Quase deixei um bug novo no caminho: o `<Toaster />` do `sonner` estava montado em `App.tsx`, arquivo que nem é o shell da aplicação — o app sobe por `main.tsx` → `AppProviders` → `RouterProvider`. Movi o `Toaster` para `AppProviders` e o feedback de sucesso passou a existir de fato.
+
+### Footer: reconstruído a partir do arquivo do Figma
+
+O rodapé não batia com o design. Em vez de comparar "olhando", extraí do `.fig` a árvore de nodes do componente `Footer` com posição e tamanho de cada elemento, e três conclusões mudaram o código:
+
+- O "W C D" não era um selo de texto no bloco da newsletter (como eu havia escrito). Eram **três service marks separadas**, cada uma num quadrado de 74×74 acima da sua feature: `W` em "Segurança da carteira", `C` em "Criadores em destaque", `D` em "Alertas de lançamentos".
+- A newsletter não era uma seção à parte acima das features: era a **4ª coluna da mesma faixa**, com a descrição *abaixo* do formulário.
+- KURIO, tagline, e-mail e telefone ficam em **uma linha de 4 colunas**; e "Redes sociais" + "Carteiras compatíveis" formam a 4ª coluna das colunas de links, não uma barra embaixo.
+
+Li também `textAlignHorizontal` dos nodes: o título e a descrição do "Diário da Cunhagem" vêm como `CENTER` no Figma (assim como o copyright), então centralizei os dois.
+
+### Guarda de rotas e atualização otimista: dois requisitos que estavam só no papel
+
+O §4 do enunciado pede proteção dos fluxos privados e "atualização otimista em pelo menos uma interação, com rollback". Auditando o código:
+
+- `requireAuthBeforeLoad` existia em `features/auth/require-auth.ts`, mas **não era importado por nenhuma rota** — código morto. Só o `/checkout` estava protegido, por um componente `RequireAuth` que redireciona *depois* de montar (spinner + `navigate` no `useEffect`). Liguei `beforeLoad: requireAuthBeforeLoad` em `checkout`, `favorites`, `orders.$orderId`, `account.profile` e `account.wallets`, e fiz a guarda preservar `?redirect=` para retomar o fluxo após o login. O `ARCHITECTURE.md` §4 já descrevia esse comportamento; agora é o código que obedece ao documento.
+- A mutação de favoritos tinha só `onSuccess` com invalidação — servidor manda, interface espera. Reescrevi com o ciclo completo: `onMutate` cancela os refetches em andamento, fotografa o cache e aplica a mudança localmente; `onError` devolve o snapshot anterior (rollback); `onSettled` revalida. O carrinho seguiu com invalidação clássica de propósito: preço, disponibilidade e total são decididos pelo servidor.
+
+### `/mercado/nft/001` renderizava o catálogo inteiro: faltava um `<Outlet />` na rota pai
+
+Acessando direto o detalhe de um NFT, o MarketplacePage inteiro aparecia por cima da arte. Quando uma rota tem filhos, o pai precisa renderizar o `<Outlet />` — sem ele, quem fica na tela é o layout do pai (no caso, a própria página do marketplace) e a rota filha nem chega a montar. Refatorei `mercado.tsx` para um layout transparente (`component: () => <Outlet />`) e movi a página real para `mercado.index.tsx` (`createFileRoute('/mercado/')`). O `routeTree.gen.ts` foi regenerado — desta vez com diff real, não só mudança de EOL.
+
+### Performance: o que descartei depois de medir
+
+Duas mudanças pareciam ganho óbvio e saíram da rodada porque medi o antes/depois com Lighthouse e o resultado foi o inverso do esperado:
+
+- **Paralelizar o bootstrap.** `await enableMocking()` em sequência com os imports do router parecia um gargalo — juntei tudo num `Promise.all`: mobile caiu de 91 → 80 e o LCP passou a carregar com "Render Delay" de 3,9 s. No modelo de rede simulada do Lighthouse, os downloads que passaram a competir atrasaram o app em vez de ajudar. Revertido — o `await` em sequência continua garantindo que o primeiro fetch já encontre o mock no ar.
+- **Preload do LCP com `media="(max-width: 767px)"`.** FCP melhorou (2250 → 2092 ms), mas o LCP piorou (3109 → 3251 ms) porque a imagem preloadada disputava o caminho crítico com CSS/JS de um jeito que atrasava a renderização do hero. Net −1 ponto; sem o preload o browser já dispara a imagem cedo no mobile.
+
+Ficaram: fontes self-hosted com subsets cortados, `width`/`height` + `loading="lazy"` nas imagens, `robots.txt`/`sitemap.xml`, e o slider com alvo ≥ 24 px.
+
+### Validação
+
+Rodo sempre a mesma bateria que o CI, nas mesmas condições (`CI=1`, `workers=1`, `retries=2`): `typecheck`, `lint`, `build:demo` e `test:e2e`. É a única forma de ter certeza de que o que passa localmente vai passar no GitHub.
 
 ---
 

@@ -60,9 +60,32 @@ export function NftDetailPage() {
     },
   })
 
+  /**
+   * Atualização otimista com rollback (§4 do enunciado).
+   * onMutate → cancela refetches, fotografa o cache e aplica a mudança
+   * localmente; onError → devolve o snapshot anterior; onSettled → revalida
+   * com o servidor para garantir consistência final.
+   */
   const toggleFavorite = useMutation({
     mutationFn: () => (isFavorite ? favoritesApi.remove(nftId) : favoritesApi.add(nftId)),
-    onSuccess: () => {
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.favorites })
+      const previous = queryClient.getQueryData<{ nftIds: string[] }>(queryKeys.favorites)
+      queryClient.setQueryData<{ nftIds: string[] }>(queryKeys.favorites, (old) =>
+        old
+          ? {
+              nftIds: isFavorite
+                ? old.nftIds.filter((id) => id !== nftId)
+                : [...old.nftIds, nftId],
+            }
+          : old,
+      )
+      return { previous }
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previous) queryClient.setQueryData(queryKeys.favorites, context.previous)
+    },
+    onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.favorites })
     },
   })
@@ -85,10 +108,10 @@ export function NftDetailPage() {
     return (
       <div className="mx-auto max-w-content px-4 py-10 sm:px-6">
         <div className="grid gap-10 lg:grid-cols-2">
-          <div className="aspect-square animate-pulse rounded-2xl bg-kurio-surface motion-reduce:animate-none" />
+          <div className="aspect-square skeleton rounded-2xl bg-kurio-surface" />
           <div className="space-y-4">
-            <div className="h-8 w-2/3 animate-pulse rounded bg-kurio-surface motion-reduce:animate-none" />
-            <div className="h-6 w-1/3 animate-pulse rounded bg-kurio-surface motion-reduce:animate-none" />
+            <div className="h-8 w-2/3 skeleton rounded bg-kurio-surface" />
+            <div className="h-6 w-1/3 skeleton rounded bg-kurio-surface" />
           </div>
         </div>
       </div>
