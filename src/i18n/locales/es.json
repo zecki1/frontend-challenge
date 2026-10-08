@@ -84,6 +84,7 @@
       ]
     },
     "pagination": {
+      "nav": "Paginación",
       "previous": "Anterior",
       "next": "Siguiente",
       "page": "Página {{page}} de {{total}}"
@@ -208,7 +209,6 @@
     "walletsTitle": "Carteras compatibles",
     "copyright": "© 2026 Kurio. Propiedad digital para todos.",
     "newsletter": {
-      "badge": "W  C  D",
       "title": "Anticípate al próximo lanzamiento",
       "subtitle": "Recibe lanzamientos seleccionados, historias de creadores y novedades del mercado.",
       "placeholder": "introduce tu email...",
@@ -275,6 +275,7 @@
     "confirmationTitle": "Pedido confirmado",
     "pendingTitle": "Procesando pedido",
     "rejectedTitle": "Pago rechazado",
+    "total": "Total",
     "transactionId": "ID de transacción",
     "date": "Fecha",
     "wallet": "Cartera",

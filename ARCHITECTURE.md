@@ -124,8 +124,12 @@ Definida em `lib/query-client.ts` e `api/query-keys.ts`:
   erros 4xx não são repetidos. Backoff exponencial (até 8s).
 - **Invalidação** após mutations (carrinho, favoritos, perfil, carteiras) e após
   eventos de tempo real.
-- **Atualização otimista**: prevista para favoritos e quantidade do carrinho
-  (rollback em erro) — será finalizada junto com as telas.
+- **Atualização otimista**: aplicada na alternância de favoritos no detalhe do
+  NFT. `onMutate` cancela os refetches em andamento, fotografa o cache e aplica
+  a mudança localmente; `onError` devolve o snapshot anterior (rollback);
+  `onSettled` revalida com o servidor para garantir consistência final. O
+  carrinho continua com invalidação clássica, porque o servidor é a fonte de
+  verdade de preço, disponibilidade e total.
 - **Cancelamento**: consultas recebem `signal` do TanStack Query (via Axios),
   descartando respostas obsoletas/fora de ordem.
 

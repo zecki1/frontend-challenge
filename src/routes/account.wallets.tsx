@@ -10,6 +10,7 @@ import { ChevronDown } from "lucide-react";
 import { queryKeys, walletsApi } from "@/api";
 import type { NetworkId } from "@/api/types";
 import { ApiError } from "@/lib/api-error";
+import { requireAuthBeforeLoad } from "@/features/auth/require-auth";
 import { AccountSidebar } from "@/components/account/account-sidebar";
 import {
   AccountField,
@@ -58,6 +59,7 @@ function shortAddress(address: string) {
 }
 
 export const Route = createFileRoute("/account/wallets")({
+  beforeLoad: requireAuthBeforeLoad,
   component: WalletsPage,
 });
 
@@ -164,7 +166,7 @@ function WalletsPage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-content px-6 py-6">
-        <div className="h-8 w-48 animate-pulse rounded bg-kurio-surface motion-reduce:animate-none" />
+        <div className="h-8 w-48 skeleton rounded bg-kurio-surface" />
       </div>
     );
   }

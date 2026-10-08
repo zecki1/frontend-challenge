@@ -11,7 +11,6 @@ import {
 } from '@/components/catalog/catalog'
 import { MobileSearchBar } from '@/components/layout/mobile-search-bar'
 import { MobileTabBar } from '@/components/layout/mobile-tab-bar'
-import { KurioFooter } from '@/components/layout/kurio-footer'
 
 export const Route = createFileRoute('/')({
   validateSearch: (search): CatalogSearch => {
@@ -96,7 +95,6 @@ function HomePage() {
       />
       <PromosSection />
       <BlogSection />
-      <KurioFooter />
       <MobileTabBar />
     </div>
   )
@@ -141,12 +139,16 @@ function HeroSection({ onSearch }: { onSearch?: (query: string) => void }) {
                 src="/nfts/nft-artwork-03-640.webp"
                 alt=""
                 aria-hidden
+                width={138}
+                height={138}
                 className="h-[138px] w-[138px] rounded-2xl object-cover"
               />
               <img
                 src="/nfts/nft-artwork-04-640.webp"
                 alt=""
                 aria-hidden
+                width={58}
+                height={58}
                 className="absolute bottom-0 left-3.5 h-[58px] w-[58px] rounded-xl object-cover"
               />
             </div>
@@ -184,6 +186,9 @@ function HeroSection({ onSearch }: { onSearch?: (query: string) => void }) {
             className="h-[450px] w-full rounded-3xl object-cover"
             width={450}
             height={450}
+            /* Escondida abaixo de 768px: sem `loading`, o navegador baixava os
+               84KB dela em mobile onde ela nunca aparece. */
+            loading="lazy"
           />
         </div>
       </section>
@@ -208,7 +213,7 @@ function PromosSection() {
             data-aos="fade-up"
             className="flex h-[250px] overflow-hidden rounded-xl bg-kurio-surface"
           >
-            <img src={promo.image} alt="" aria-hidden className="w-1/2 object-cover" loading="lazy" />
+            <img src={promo.image} alt="" aria-hidden width={640} height={500} className="w-1/2 object-cover" loading="lazy" />
             <div className="flex flex-1 flex-col items-end justify-end px-6 text-right">
               <p className="whitespace-pre-line text-lg font-bold leading-6 text-kurio-cream">{promo.title}</p>
               <p className="mt-2 text-sm leading-[1.6] text-kurio-sand">{promo.text}</p>
@@ -245,7 +250,7 @@ function BlogSection() {
 
   return (
     <section className="mx-auto mt-24 max-w-content px-4 sm:px-6">
-      <div className="space-y-3">
+      <div className="space-y-3 text-center">
         <h2 className="text-[28px] font-bold leading-tight text-kurio-cream2">{t('home.blog.title')}</h2>
         <p className="text-sm text-kurio-sand">{t('home.blog.subtitle')}</p>
       </div>
@@ -260,6 +265,8 @@ function BlogSection() {
               src={images[index % images.length]}
               alt=""
               aria-hidden
+              width={640}
+              height={195}
               className="h-[195px] w-full object-cover"
               loading="lazy"
             />
