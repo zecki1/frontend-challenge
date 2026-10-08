@@ -15,9 +15,18 @@ test.beforeEach(async ({ page }) => {
   await page.evaluate(() => window.__mocks!.reset());
 });
 
+/**
+ * Botão de submit do formulário de login. O header também renderiza um botão
+ * "Entrar" (que abre o modal), então restringimos ao `<form>` da página.
+ */
+function submitLogin(page: import("@playwright/test").Page) {
+  return page.locator("form").getByRole("button", { name: "Entrar" });
+}
+
 test("catálogo carrega NFTs a partir dos mocks", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  const cards = page.locator('main a[href^="/nfts/"]');
+  // O catálogo navega para `/mercado/nft/<numero>` (path param do TanStack Router).
+  const cards = page.locator('main a[href^="/mercado/nft/"]');
   await expect(cards.first()).toBeVisible();
   expect(await cards.count()).toBeGreaterThan(0);
 });
@@ -37,9 +46,13 @@ test("NFT inexistente mostra estado de erro", async ({ page }) => {
 
 test("login autentica e mostra o usuário na navegação", async ({ page }) => {
   await page.goto("/login");
-  await page.getByLabel("E-mail").fill("collector@example.com");
-  await page.getByLabel("Senha").fill("password123");
-  await page.getByRole("button", { name: "Entrar" }).click();
+  // `exact: true` evita casar com o aria-label do input da newsletter do footer
+  // ("digite seu e-mail..."), que senão torna o localizador ambíguo.
+  await page.getByLabel("E-mail", { exact: true }).fill("collector@example.com");
+  await page.getByLabel("Senha", { exact: true }).fill("password123");
+  // O header também expõe um botão "Entrar" (abre o modal de login);
+  // restringimos ao formulário para evitar violação de strict mode.
+  await submitLogin(page).click();
   await expect(page).not.toHaveURL(/\/login/);
   if (test.info().project.name === "chromium-desktop") {
     await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
@@ -52,5 +65,5 @@ test("login autentica e mostra o usuário na navegação", async ({ page }) => {
 test("rota privada redireciona visitante para o login", async ({ page }) => {
   await page.goto("/checkout");
   await expect(page).toHaveURL(/\/login/);
-  await expect(page.getByRole("button", { name: "Entrar" })).toBeVisible();
+  await expect(submitLogin(page)).toBeVisible();
 });
