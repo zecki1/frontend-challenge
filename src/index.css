@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Tema KURIO (dark) — extraído do Figma */
+    --background: 18 33% 6%;
+    --foreground: 38 41% 95%;
+    --card: 14 33% 11%;
+    --card-foreground: 38 41% 95%;
+    --popover: 14 33% 11%;
+    --popover-foreground: 38 41% 95%;
+    --primary: 28 60% 56%;
+    --primary-foreground: 18 33% 6%;
+    --secondary: 18 38% 13%;
+    --secondary-foreground: 38 41% 95%;
+    --muted: 18 38% 13%;
+    --muted-foreground: 34 42% 68%;
+    --accent: 28 60% 56%;
+    --accent-foreground: 18 33% 6%;
+    --destructive: 355 84% 52%;
+    --destructive-foreground: 38 41% 95%;
+    --border: 18 25% 22%;
+    --input: 18 25% 22%;
+    --ring: 28 60% 56%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 18 33% 6%;
+    --foreground: 38 41% 95%;
+    --card: 14 33% 11%;
+    --card-foreground: 38 41% 95%;
+    --popover: 14 33% 11%;
+    --popover-foreground: 38 41% 95%;
+    --primary: 28 60% 56%;
+    --primary-foreground: 18 33% 6%;
+    --secondary: 18 38% 13%;
+    --secondary-foreground: 38 41% 95%;
+    --muted: 18 38% 13%;
+    --muted-foreground: 34 42% 68%;
+    --accent: 28 60% 56%;
+    --accent-foreground: 18 33% 6%;
+    --destructive: 355 84% 52%;
+    --destructive-foreground: 38 41% 95%;
+    --border: 18 25% 22%;
+    --input: 18 25% 22%;
+    --ring: 28 60% 56%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-mono antialiased;
+  }
+
+  html {
+    @apply dark;
+  }
+}
+
+/* Scrollbar discreta no tema escuro */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+::-webkit-scrollbar-thumb {
+  background: #38220f;
+  border-radius: 9999px;
+}
+
+/* Slider duplo de preço (Figma Filters: thumb 15px cobre com borda 3px) */
+.range-thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: auto;
+  height: 15px;
+  width: 15px;
+  border-radius: 9999px;
+  background: #d28a4c;
+  border: 3px solid #140d0a;
+  cursor: pointer;
+}
+.range-thumb::-moz-range-thumb {
+  pointer-events: auto;
+  height: 15px;
+  width: 15px;
+  border-radius: 9999px;
+  background: #d28a4c;
+  border: 3px solid #140d0a;
+  cursor: pointer;
+}
+
+/* --- Acessibilidade e Filtros --- */
+.font-dyslexic {
+  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif !important;
+  line-height: 1.6;
+  letter-spacing: 0.05em;
+}
+.mode-monochrome {
+  filter: grayscale(100%);
+}
+.mode-protanopia {
+  filter: contrast(110%) sepia(20%) hue-rotate(-10deg);
+}
+.mode-deuteranopia {
+  filter: contrast(110%) sepia(20%) hue-rotate(10deg);
+}
+.mode-tritanopia {
+  filter: contrast(120%) sepia(10%) hue-rotate(40deg);
+}
