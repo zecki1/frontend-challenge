@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useState, type MouseEvent } from 'react'
 import { Link } from '@tanstack/react-router'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { z } from 'zod'
+import { cartApi, queryKeys } from '@/api'
 import type { Nft, NftCategory, NftSort } from '@/api'
 import { formatEth } from '@/lib/decimal'
 
@@ -145,9 +148,9 @@ export function CatalogSection(props: CatalogProps) {
             <ul className="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-3 md:gap-x-[34px] md:gap-y-[72px] max-md:[&>*:nth-child(even)]:mt-8">
               {Array.from({ length: 6 }).map((_, index) => (
                 <li key={index} className="space-y-3">
-                  <div className="h-[200px] w-full animate-pulse rounded-xl bg-kurio-surface motion-reduce:animate-none md:h-[300px]" />
-                  <div className="h-4 w-3/4 animate-pulse rounded bg-kurio-surface motion-reduce:animate-none" />
-                  <div className="h-4 w-1/3 animate-pulse rounded bg-kurio-surface motion-reduce:animate-none" />
+                  <div className="h-[200px] w-full skeleton rounded-xl bg-kurio-surface md:h-[300px]" />
+                  <div className="h-4 w-3/4 skeleton rounded bg-kurio-surface" />
+                  <div className="h-4 w-1/3 skeleton rounded bg-kurio-surface" />
                 </li>
               ))}
             </ul>
@@ -163,7 +166,7 @@ export function CatalogSection(props: CatalogProps) {
                 ))}
               </ul>
 
-              <nav aria-label={t('home.pagination')} className="mt-10 flex items-center justify-end gap-2">
+              <nav aria-label={t('home.pagination.nav')} className="mt-10 flex items-center justify-end gap-2">
                 {(props.data.totalPages > 0 ? Array.from({ length: props.data.totalPages }) : [1]).map(
                   (_, index) => {
                     const pageNumber = index + 1
@@ -189,7 +192,7 @@ export function CatalogSection(props: CatalogProps) {
                   type="button"
                   disabled={props.page >= props.data.totalPages}
                   onClick={() => props.onPageChange(props.page + 1)}
-                  aria-label={t('home.nextPage')}
+                  aria-label={t('home.pagination.next')}
                   className="flex h-[35px] w-[35px] items-center justify-center rounded-[4px] border border-[#3f2319] text-kurio-cream transition-colors hover:bg-kurio-surface disabled:opacity-40"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
@@ -253,7 +256,8 @@ function Sidebar({
 
         <p className="mt-10 font-mono text-[18px] font-bold text-kurio-cream2">{t('home.priceRange')}</p>
         <div className="mt-3 px-3">
-          <div className="relative h-[21px] w-full">
+          {/* h-6 (24px): casa com a altura mínima de alvo do Lighthouse. */}
+          <div className="relative h-6 w-full">
             <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 bg-kurio-surface2" aria-hidden />
             <div
               className="absolute top-1/2 h-1 -translate-y-1/2 bg-kurio-copper"
@@ -268,7 +272,7 @@ function Sidebar({
               value={min}
               onChange={(event) => setMin(clamp(Number(event.target.value), max, true))}
               aria-label={t('home.priceRange')}
-              className="range-thumb pointer-events-none absolute inset-0 h-[21px] w-full appearance-none bg-transparent"
+              className="range-thumb pointer-events-none absolute inset-0 h-6 w-full appearance-none bg-transparent"
             />
             <input
               type="range"
@@ -278,7 +282,7 @@ function Sidebar({
               value={max}
               onChange={(event) => setMax(clamp(Number(event.target.value), min, false))}
               aria-label={t('home.priceRange')}
-              className="range-thumb pointer-events-none absolute inset-0 h-[21px] w-full appearance-none bg-transparent"
+              className="range-thumb pointer-events-none absolute inset-0 h-6 w-full appearance-none bg-transparent"
             />
           </div>
           <p className="mt-3 text-[15px] text-kurio-cream2">
@@ -329,6 +333,8 @@ export function FeaturedBanner() {
       <img
         src="/nfts/nft-artwork-04-640.webp"
         alt={t('home.featured')}
+        width={640}
+        height={368}
         className="mt-4 h-[368px] w-full rounded-[22px] object-cover"
         loading="lazy"
       />
@@ -349,6 +355,26 @@ export function NftCard({ nft, showRarityBadge = false }: { nft: Nft; showRarity
   const art640 = nft.imageUrl.replace('-1280', '-640')
   // Extrair número do ID (ex: "nft-001" -> "001")
   const nftNumber = nft.id.replace('nft-', '')
+  const queryClient = useQueryClient()
+  const addToCart = useMutation({
+    mutationFn: (editionId: string) =>
+      cartApi.addItem({ nftId: nft.id, editionId, quantity: 1 }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.cart })
+      toast.success(t('nft.added'))
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : t('common.error'))
+    },
+  })
+
+  const handleAddToCart = (event: MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    const edition =
+      nft.editions.find((entry) => entry.available > 0) ?? nft.editions[0]
+    if (edition) addToCart.mutate(edition.id)
+  }
   return (
     <li data-aos="fade-up" className="group">
       <Link to="/mercado/nft/$nftNumber" params={{ nftNumber }} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kurio-copper">
@@ -358,6 +384,8 @@ export function NftCard({ nft, showRarityBadge = false }: { nft: Nft; showRarity
             srcSet={`${art640} 640w, ${nft.imageUrl} 1280w`}
             sizes="(max-width: 768px) 45vw, 258px"
             alt={`Arte do NFT ${nft.name}`}
+            width={250}
+            height={250}
             loading="lazy"
             className="mx-auto mt-3 h-[168px] w-[168px] rounded-xl object-cover transition-transform duration-300 group-hover:scale-[1.03] md:absolute md:left-1/2 md:top-[31px] md:mt-0 md:h-[250px] md:w-[250px] md:-translate-x-1/2 md:rounded-none"
           />
@@ -373,12 +401,10 @@ export function NftCard({ nft, showRarityBadge = false }: { nft: Nft; showRarity
           <div className="absolute right-2.5 top-3 flex flex-col gap-2 md:opacity-0 md:transition-opacity md:group-hover:opacity-100 md:group-focus-within:opacity-100">
             <button
               type="button"
-              aria-label={t('nft.buy')}
-              onClick={(event) => {
-                event.preventDefault()
-                window.location.assign(`/nfts/${nft.id}`)
-              }}
-              className="hidden h-9 w-9 items-center justify-center rounded-lg bg-kurio-surface2/90 text-kurio-cream transition-colors hover:text-kurio-copper md:flex"
+              aria-label={t('nft.addToCart')}
+              onClick={handleAddToCart}
+              disabled={nft.totalAvailable === 0 || addToCart.isPending}
+              className="hidden h-9 w-9 items-center justify-center rounded-lg bg-kurio-surface2/90 text-kurio-cream transition-colors hover:text-kurio-copper disabled:cursor-not-allowed disabled:opacity-50 md:flex"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6zM3 6h18M16 10a4 4 0 0 1-8 0" />

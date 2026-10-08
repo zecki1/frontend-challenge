@@ -7,9 +7,11 @@ import { cartApi, ordersApi, queryKeys, walletsApi } from '@/api'
 import { ApiError } from '@/lib/api-error'
 import { addEth, formatEth, mulEth } from '@/lib/decimal'
 import { RequireAuth } from '@/components/auth/require-auth'
+import { requireAuthBeforeLoad } from '@/features/auth/require-auth'
 import { useAuth } from '@/features/auth/auth-context'
 
 export const Route = createFileRoute('/checkout')({
+  beforeLoad: requireAuthBeforeLoad,
   component: CheckoutPage,
 })
 

@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, Image as ImageIcon } from "lucide-react";
 import { profileApi, queryKeys } from "@/api";
 import { ApiError } from "@/lib/api-error";
+import { requireAuthBeforeLoad } from "@/features/auth/require-auth";
 import { AccountSidebar } from "@/components/account/account-sidebar";
 import {
   AccountField,
@@ -44,6 +45,7 @@ const passwordSchema = z
 type PasswordForm = z.infer<typeof passwordSchema>;
 
 export const Route = createFileRoute("/account/profile")({
+  beforeLoad: requireAuthBeforeLoad,
   component: ProfilePage,
 });
 
@@ -75,7 +77,6 @@ function ProfilePage() {
   });
 
   useEffect(() => {
-    console.log('[hydrate] profile=', profile?.name, 'hydrated=', hydratedRef.current, 'get=', profileForm.getValues('name'))
     if (profile && !hydratedRef.current) {
       hydratedRef.current = true;
       profileForm.reset({
@@ -131,7 +132,7 @@ function ProfilePage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-content px-6 py-6">
-        <div className="h-8 w-48 animate-pulse rounded bg-kurio-surface motion-reduce:animate-none" />
+        <div className="h-8 w-48 skeleton rounded bg-kurio-surface" />
       </div>
     );
   }
