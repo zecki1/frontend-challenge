@@ -84,6 +84,7 @@
       ]
     },
     "pagination": {
+      "nav": "Pagination",
       "previous": "Previous",
       "next": "Next",
       "page": "Page {{page}} of {{total}}"
@@ -208,7 +209,6 @@
     "walletsTitle": "Supported wallets",
     "copyright": "© 2026 Kurio. Digital property for everyone.",
     "newsletter": {
-      "badge": "W  C  D",
       "title": "Stay ahead of the next drop",
       "subtitle": "Get curated drops, creator stories, and market insights.",
       "placeholder": "enter your email...",
@@ -275,6 +275,7 @@
     "confirmationTitle": "Order confirmed",
     "pendingTitle": "Processing order",
     "rejectedTitle": "Payment declined",
+    "total": "Total",
     "transactionId": "Transaction ID",
     "date": "Date",
     "wallet": "Wallet",

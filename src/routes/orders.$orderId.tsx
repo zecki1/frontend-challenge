@@ -4,8 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { HeartHandshake, X } from 'lucide-react'
 import { ordersApi, queryKeys, walletsApi } from '@/api'
 import { formatEth } from '@/lib/decimal'
+import { requireAuthBeforeLoad } from '@/features/auth/require-auth'
 
 export const Route = createFileRoute('/orders/$orderId')({
+  beforeLoad: requireAuthBeforeLoad,
   component: OrderConfirmationPage,
 })
 
@@ -39,7 +41,7 @@ function OrderConfirmationPage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-content px-4 py-10 sm:px-6">
-        <div className="h-8 w-48 animate-pulse rounded bg-kurio-surface motion-reduce:animate-none" />
+        <div className="h-8 w-48 skeleton rounded bg-kurio-surface" />
       </div>
     )
   }
