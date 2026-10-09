@@ -53,21 +53,17 @@ export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
 
   const mswReady = useMswReady()
 
-  if (!rawNftId) {
-    return <div className="p-8 text-center text-kurio-coral">Erro: nftId não fornecido</div>
-  }
-
   const { data: nft, isLoading, isError, error } = useQuery({
     queryKey: queryKeys.nfts.detail(nftId),
     queryFn: ({ signal }) => nftsApi.detail(nftId, signal),
     retry: false,
-    enabled: mswReady,
+    enabled: mswReady && Boolean(rawNftId),
   })
 
   const { data: favorites } = useQuery({
     queryKey: queryKeys.favorites,
     queryFn: ({ signal }) => favoritesApi.list(signal),
-    enabled: mswReady && isAuthenticated,
+    enabled: mswReady && isAuthenticated && Boolean(rawNftId),
   })
 
   const isFavorite = isAuthenticated && (favorites?.nftIds.includes(nftId) ?? false)
@@ -122,6 +118,10 @@ export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
     const el = galleryRef.current
     if (!el || el.clientWidth === 0) return
     setMobileSlide(Math.round(el.scrollLeft / el.clientWidth))
+  }
+
+  if (!rawNftId) {
+    return <div className="p-8 text-center text-kurio-coral">Erro: nftId não fornecido</div>
   }
 
   if (isLoading) {

@@ -27,7 +27,7 @@ async function login(page: import("@playwright/test").Page) {
     .click();
   await expect(page).not.toHaveURL(/\/login/);
   if (test.info().project.name === "chromium-desktop") {
-    await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Menu do usuário" })).toBeVisible();
   }
 }
 
