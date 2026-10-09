@@ -8,13 +8,29 @@
 
 ---
 
-## 📸 Screenshots do Produto (Mobile)
+## 📸 Screenshots do Produto (Visual Regression Baselines)
 
-### Detalhe do NFT — Mobile
-![NFT Detail Mobile](./docs/screenshots/nft-detail-visual-mobile-win32.png)
+### Home
+| Desktop | Mobile |
+|---------|--------|
+| ![Home Desktop](./docs/screenshots/home-visual-desktop-win32.png) | ![Home Mobile](./docs/screenshots/home-visual-mobile-win32.png) |
 
-### Checkout — Mobile
-![Checkout Mobile](./docs/screenshots/checkout-visual-mobile-win32.png>
+### Detalhe do NFT
+| Desktop | Mobile |
+|---------|--------|
+| ![NFT Detail Desktop](./docs/screenshots/nft-detail-visual-desktop-win32.png) | ![NFT Detail Mobile](./docs/screenshots/nft-detail-visual-mobile-win32.png) |
+
+### Carrinho
+| Desktop | Mobile |
+|---------|--------|
+| ![Cart Desktop](./docs/screenshots/cart-visual-desktop-win32.png) | ![Cart Mobile](./docs/screenshots/cart-visual-mobile-win32.png) |
+
+### Checkout
+| Desktop | Mobile |
+|---------|--------|
+| ![Checkout Desktop](./docs/screenshots/checkout-visual-desktop-win32.png) | ![Checkout Mobile](./docs/screenshots/checkout-visual-mobile-win32.png) |
+
+> **Baselines completas:** 8/8 screenshots (desktop + mobile) versionadas em `e2e/__screenshots__/visual.spec.ts-snapshots/`. Rodar/atualizar: `npm run test:e2e:visual -- --update-snapshots`.
 
 ---
 
@@ -24,7 +40,7 @@
 |---------|-----------|
 | [`docs/ENUNCIADO.md`](./docs/ENUNCIADO.md) | Enunciado completo do desafio |
 | [`ARCHITECTURE.md`](./ARCHITECTURE.md) | Arquitetura: contratos, cache, tempo real, mocks, limitações |
-| [`docs/DECISOES.md`](./docs/DECISOES.md) | Registro de decisões, performance, acessibilidade, cronograma |
+| [`docs/DECISOES.md`](./docs/DECISOES.md) | Registro de decisões, performance, acessibilidade, cronograma detalhado |
 | [`docs/RESUMO-ENTREGA.md`](./docs/RESUMO-ENTREGA.md) | Checklist de entrega e validações |
 
 ---
@@ -107,8 +123,8 @@ npm run build:demo && npm run preview
 
 | Fase | Período | Tempo | Principais Entregas |
 |------|---------|-------|---------------------|
-| **Setup & Arquitetura** | 07/10 15:18–19:00 | ~3.5h | TanStack Router/Query, Axios, MSW, Socket.IO, contratos tipados, `src/api/types.ts` |
-| **Mocks & Cenários** | 07/10 19:00–22:00 | ~3h | DB, fixtures, handlers REST/WS, cenários (`fast`, `slow-network`, `payment-declined`, etc.) |
+| **Setup & Arquitetura** | 07/10 15:18–19:00 | ~3.5h | TanStack Router/Query, Axios, MSW, Socket.IO, contratos tipados |
+| **Mocks & Cenários** | 07/10 19:00–22:00 | ~3h | DB, fixtures, handlers REST/WS, cenários (`fast`, `slow-network`, etc.) |
 | **Autenticação & Guards** | 08/10 09:00–13:00 | ~4h | Login/register, JWT mock, `RequireAuth` com `?redirect=`, `mswReady` race fix |
 | **Catálogo & Filtros** | 08/10 13:00–17:00 | ~4h | Grid, busca, categorias, faixa de preço (slider dual), ordenação, paginação |
 | **Detalhe NFT** | 08/10 17:00–21:00 | ~4h | Galeria zoom, edições, quantidade, favoritos (optimistic), compra → carrinho |
@@ -116,15 +132,15 @@ npm run build:demo && npm run preview
 | **Checkout & Pedidos** | 09/10 12:00–15:00 | ~3h | Carteiras, rede, cotação ETH (`big.js`), idempotência, confirmação/recusa |
 | **Tempo Real (Socket.IO)** | 09/10 15:00–16:30 | ~1.5h | `nft.updated`/`order.updated`, reconciliação REST, deduplicação, `kurio:auth-logout` |
 | **Mobile & Acessibilidade** | 09/10 16:30–18:30 | ~2h | Tab bar fixa (95px), QR alinhado, slider ≥24px, skeletons shimmer, OpenDyslexic, VLibras |
-| **Performance & SEO** | 09/10 18:30–19:30 | ~1h | Fontes self-hosted (subset latin), `width/height`+`lazy`, `robots.txt`/`sitemap.xml`, Lighthouse |
+| **Performance & SEO** | 09/10 18:30–19:30 | ~1h | Fontes self-hosted (subset latin), `width/height`+`lazy`, `robots.txt`/`sitemap.xml` |
 | **E2E & Visual Regression** | 09/10 19:30–20:30 | ~1h | 20/20 testes (desktop+mobile), 8 baselines visuais, CI pipeline |
-| **Documentação & Deploy** | 09/10 20:30–21:30 | ~1h | README, ARCHITECTURE, DECISOES, DECISOES, screenshots mobile, Vercel PRs |
+| **Documentação & Deploy** | 09/10 20:30–21:30 | ~1h | README, ARCHITECTURE, DECISOES, screenshots mobile, Vercel PRs |
 
 | **Total** | **07/10 15:18 → 09/10 21:30** | **~31h** | **Entrega completa** |
 
----
+> **Nota:** Prazo original de 2 dias úteis (07/10–09/10). Trabalho executado em ~31h distribuídas ao longo de 2 dias.
 
-> **Nota:** Prazo original de 2 dias úteis (07/10–09/10). Trabalho executado em ~31h distribuídas ao longo de 2 dias, com margem para imprevistos (fixes de CI, ajustes de mobile tab bar, crash `includes`).
+---
 
 ## 🏗️ Stack Obrigatória
 
