@@ -73,7 +73,7 @@ function MarketplacePage() {
   }
 
   return (
-    <div className="pb-24">
+    <div className="md:pb-24">
       <MarketplaceBanner />
       <CatalogSection
         tab={tab}

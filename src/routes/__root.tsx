@@ -2,6 +2,7 @@ import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { KurioHeader } from '@/components/layout/kurio-header'
 import { KurioFooter } from '@/components/layout/kurio-footer'
+import { MobileTabBar } from '@/components/layout/mobile-tab-bar'
 import { SupportWidget } from '@/components/support-widget'
 import { VlibrasWidget } from '@/components/vlibras-widget'
 
@@ -20,10 +21,11 @@ function RootLayout() {
         Pular para o conteúdo
       </a>
       <KurioHeader />
-      <main id="conteudo" className="flex-1">
+      <main id="conteudo" className="flex-1 pb-32 md:pb-0">
         <Outlet />
       </main>
       <KurioFooter />
+      <MobileTabBar />
       <SupportWidget />
       <VlibrasWidget />
       {import.meta.env.DEV ? <TanStackRouterDevtools position="bottom-right" /> : null}

@@ -10,7 +10,6 @@ import {
   type CatalogSearch,
 } from '@/components/catalog/catalog'
 import { MobileSearchBar } from '@/components/layout/mobile-search-bar'
-import { MobileTabBar } from '@/components/layout/mobile-tab-bar'
 import { useMswReady } from '@/lib/msw-ready'
 
 export const Route = createFileRoute('/')({
@@ -74,7 +73,7 @@ function HomePage() {
   }
 
   return (
-    <div className="pb-32 md:pb-24">
+    <div className="md:pb-24">
       <HeroSection onSearch={(query) => updateSearch({ q: query || undefined, page: undefined })} />
       <CatalogSection
         tab={tab}
@@ -98,7 +97,6 @@ function HomePage() {
       />
       <PromosSection />
       <BlogSection />
-      <MobileTabBar />
     </div>
   )
 }

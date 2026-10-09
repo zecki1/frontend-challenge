@@ -28,7 +28,7 @@ function FavoritesPage() {
   })
 
   const favoriteNfts = (nfts?.items ?? []).filter((nft) =>
-    favorites?.nftIds.includes(nft.id),
+    (favorites?.nftIds ?? []).includes(nft.id),
   )
 
   return (

@@ -9,18 +9,15 @@
     "sair": "Sign out",
     "carrinho": "Cart",
     "perfil": "Profile",
-    "carteiras": "Wallets",
     "favorites": "Favorites",
     "mobileTabs": "Main navigation",
     "userMenu": "User menu",
     "scanQr": "Scan QR Code"
   },
   "common": {
-    "loading": "Loading…",
     "retry": "Try again",
     "error": "Something went wrong",
     "empty": "Nothing here yet",
-    "explore": "Explore",
     "seeMore": "Read more",
     "language": "Language",
     "close": "Close"
@@ -87,9 +84,7 @@
     },
     "pagination": {
       "nav": "Pagination",
-      "previous": "Previous",
-      "next": "Next",
-      "page": "Page {{page}} of {{total}}"
+      "next": "Next"
     },
     "priceRangeLabel": "Price: {{min}} - {{max}} ETH",
     "searchPlaceholder": "Explore collections",
@@ -109,9 +104,7 @@
     "marketplaceSubtitle": "Discover curated NFTs from creators around the world and collect verified digital art."
   },
   "nft": {
-    "available": "{{count}} available",
     "soldOut": "Sold out",
-    "editions": "Editions",
     "quantity": "Quantity",
     "addToCart": "Add to cart",
     "adding": "Adding…",
@@ -125,7 +118,6 @@
     "notFoundText": "The given identifier does not match any NFT.",
     "backToCatalog": "Back to catalog",
     "related": "Collectors also viewed",
-    "reviews": "Collector reviews",
     "badgeRarity": "RARE",
     "decrease": "Decrease quantity",
     "increase": "Increase quantity",
@@ -159,7 +151,6 @@
   },
   "auth": {
     "loginTitle": "Sign in",
-    "loginSubtitle": "Sign in to manage your wallet, collection and creator profile.",
     "registerTitle": "Create account",
     "registerSubtitle": "Create your collector profile and connect a wallet whenever you want.",
     "name": "Display name",
@@ -181,8 +172,7 @@
     "noAccount": "New to Kurio?",
     "createAccountLink": "Create an account",
     "hasAccount": "Already have an account?",
-    "loginLink": "Sign in",
-    "loggedInAs": "Signed in as {{name}}"
+    "loginLink": "Sign in"
   },
   "footer": {
     "tagline": "Made for collectors,\ncreators and culture",
@@ -243,7 +233,6 @@
     "total": "Total",
     "couponPlaceholder": "Enter the promo code...",
     "apply": "Apply",
-    "goToCheckout": "Go to checkout",
     "remove": "Remove",
     "heading": "NFT Cart",
     "price": "Price",
@@ -251,18 +240,25 @@
     "walletSummary": "Wallet Summary",
     "promoCode": "Promo code",
     "estimatedFee": "Estimated fee",
-    "editionLabel": "Edition: {{edition}}"
+    "editionLabel": "Edition: {{edition}}",
+    "changes": {
+      "title": "Your cart was updated",
+      "item": "An item in your cart",
+      "priceChanged": "The price of {{name}} changed from {{from}} to {{to}}.",
+      "priceChangedGeneric": "The price of {{name}} changed.",
+      "outOfStock": "The stock of {{name}} changed. Review the quantity or remove the item.",
+      "editionUnavailable": "{{name}} is no longer available and was removed from the quote.",
+      "couponInvalid": "The coupon {{code}} is invalid.",
+      "couponExpired": "The coupon {{code}} expired."
+    }
   },
   "checkout": {
     "title": "Checkout",
-    "collectorData": "Collector details",
     "walletAndNetwork": "Wallet & network",
     "selectWallet": "Select a wallet",
     "selectNetwork": "Select a network",
     "confirmPurchase": "Confirm purchase",
     "connectAndFinish": "Connect and finish",
-    "review": "Review order",
-    "summary": "Wallet summary",
     "yourNfts": "Your NFTs",
     "promoPrompt": "Have a promo code? Apply it here",
     "networkLabel": "Network",
@@ -280,7 +276,6 @@
     "supportedBrands": "METAMASK  •  WALLETCONNECT  •  COINBASE"
   },
   "orders": {
-    "confirmationTitle": "Order confirmed",
     "pendingTitle": "Processing order",
     "rejectedTitle": "Payment declined",
     "total": "Total",

@@ -67,3 +67,12 @@ test("rota privada redireciona visitante para o login", async ({ page }) => {
   await expect(page).toHaveURL(/\/login/);
   await expect(submitLogin(page)).toBeVisible();
 });
+
+test("menu inferior aparece em todas as páginas no mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const tabBar = page.locator('nav[aria-label="Navegação principal"]');
+  for (const path of ["/", "/mercado", "/nfts/nft-001", "/cart"]) {
+    await page.goto(path);
+    await expect(tabBar).toBeVisible();
+  }
+});

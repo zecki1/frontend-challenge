@@ -20,8 +20,11 @@ export const queryKeys = {
     detail: (id: string) => ['nfts', 'detail', id] as const,
   },
   cart: ['cart'] as const,
-  quote: (params: { couponCode?: string | null }) =>
-    ['quote', params] as const,
+  quote: {
+    all: ['quote'] as const,
+    detail: (params: { couponCode?: string | null; version?: number }) =>
+      ['quote', params] as const,
+  },
   orders: {
     all: ['orders'] as const,
     detail: (id: string) => ['orders', 'detail', id] as const,

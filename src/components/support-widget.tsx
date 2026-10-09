@@ -105,7 +105,7 @@ export function SupportWidget() {
       <button
         type="button"
         onClick={onOpen}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-kurio-copper text-kurio-bg shadow-lg shadow-black/40 transition-transform hover:scale-105"
+        className="fixed bottom-[110px] right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-kurio-copper text-kurio-bg shadow-lg shadow-black/40 transition-transform hover:scale-105 md:bottom-6"
         aria-label={t('support.open')}
       >
         <LifeBuoy className="h-6 w-6" aria-hidden />

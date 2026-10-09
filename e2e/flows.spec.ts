@@ -166,3 +166,36 @@ test("cupom: aplicar código válido", async ({ page }) => {
     page.getByText("Desconto do lançamento").filter(visible).first(),
   ).toBeVisible();
 });
+
+test("carrinho: avisa quando o preço do item muda (tempo real)", async ({
+  page,
+}) => {
+  await login(page);
+  await page.goto("/nfts/nft-001");
+  await page
+    .getByRole("button", { name: /comprar/i })
+    .filter(visible)
+    .first()
+    .click();
+  await expect(
+    page.getByText("Adicionado ao carrinho.").filter(visible).first(),
+  ).toBeVisible();
+
+  await page.goto("/cart");
+  await expect(
+    page.getByText("Emerald Ape #042").filter(visible).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Seu carrinho foi atualizado").filter(visible).first(),
+  ).toBeHidden();
+
+  // Emite `nft.updated`; o realtime invalida a cotação e o aviso aparece.
+  await page.evaluate(() => window.__mocks!.emitNftPriceChange("nft-001", 1.5));
+
+  await expect(
+    page.getByText("Seu carrinho foi atualizado").filter(visible).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/O preço de Emerald Ape #042 mudou/).filter(visible).first(),
+  ).toBeVisible();
+});

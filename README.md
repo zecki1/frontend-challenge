@@ -75,9 +75,12 @@ Cadastro também está disponível e cria um novo usuário no mock.
 | `npm run typecheck` | Gera rotas + `tsc -b` |
 | `npm run lint` | ESLint |
 | `npm run test:e2e` | Playwright (desktop + mobile) |
+| `npm run test:e2e:visual` | Regressão visual com baselines versionadas |
 | `npm run test:e2e:report` | Abre o relatório HTML do Playwright |
 | `npm run lighthouse` | Auditoria Lighthouse mobile + desktop (3 medições/página) |
 | `npm run routes:generate` | Regenera `src/routeTree.gen.ts` |
+
+> **Regressão visual:** as baselines do `toHaveScreenshot` são específicas da plataforma (sufixo `-win32`/`-linux` no nome do arquivo), por isso `test:e2e:visual` roda à parte do `test:e2e` — o CI principal (Linux) não compara com baselines geradas no Windows. Gere/atualize com `npm run test:e2e:visual -- --update-snapshots` na mesma plataforma em que vai comparar.
 
 ---
 
@@ -150,8 +153,8 @@ A base arquitetural está completa e a fidelidade visual com o Figma foi aplicad
 
 - **Stack obrigatória**: React/TS, TanStack Router/Query, Axios, MSW (REST + WebSocket via Socket.IO), Tailwind + shadcn/ui, Playwright, Lighthouse.
 - **Rotas e telas do enunciado**: Início, Mercado + Detalhe (`/mercado/nft/<numero>`), Carrinho, Checkout, Pedidos, Login/Cadastro, Perfil, Carteiras — com fidelidade visual ao Figma.
-- **Fluxos**: favoritos com atualização otimista + rollback; carrinho (quantidade, cupom, snapshots de preço/disponibilidade); checkout com cotação em ETH (`big.js`, `Number` proibido em cálculo) e bloqueio quando o preço muda; pedidos confirmado/recusado; guardas de rota com `?redirect=`; tempo real `nft.updated` e `order.updated` com reconciliação após reconexão.
-- **Qualidade**: `typecheck` 0 erros · `lint` 0 erros (6 warnings pré-existentes de `react-refresh`) · **E2E 20/20** (Chromium desktop + mobile) · Lighthouse **P ≥ 90 mobile / ≥ 95 desktop, A11y 100 / BP 100 / SEO 100** (números e método na seção Performance).
+- **Fluxos**: favoritos com atualização otimista + rollback; carrinho (quantidade, cupom, snapshots de preço/disponibilidade com **aviso de preço alterado em tempo real** via `Quote.changes`); checkout com cotação em ETH (`big.js`, `Number` proibido em cálculo) e bloqueio quando o preço muda; pedidos confirmado/recusado; guardas de rota com `?redirect=`; tempo real `nft.updated` e `order.updated` com reconciliação após reconexão; menu inferior visível em todas as telas mobile.
+- **Qualidade**: `typecheck` 0 erros · `lint` 0 erros (8 warnings pré-existentes de `react-refresh`) · **E2E 22/22** (Chromium desktop + mobile) · **regressão visual 8/8** (baselines em `e2e/__screenshots__`, rodar com `npm run test:e2e:visual`) · Lighthouse **P ≥ 90 mobile / ≥ 95 desktop, A11y 100 / BP 100 / SEO 100** (números e método na seção Performance).
 - **Performance**: fontes self-hosted com subsets `latin`/`latin-ext`, imagens com `width`/`height` + `loading="lazy"`, `public/robots.txt` + `sitemap.xml`, alvos de toque ≥ 24 px.
 - **Sem evidências de IA no app**: removido `llms.txt`; WebP sem metadados C2PA; README/comentários sem menção a IA.
 
@@ -188,16 +191,16 @@ Erros reportados e seu estado de correção (tab bar, catálogo, PageSpeed, agê
 | Smoke test no domínio da Vercel (MSW/tempo real/rewrites) | 30–60 min |
 | Matriz de dispositivos (emuladores + 1 físico) | 1–2 h |
 | Correções que aparecerem nos testes (buffer) | 1–3 h |
-| Opcionais de afinação: §7 aviso de preço no carrinho, chaves i18n mortas, baselines visuais E2E, variantes 320/480 das artes | 2–4 h |
+| Opcionais de afinação: variantes 320/480 das artes | 30–60 min |
 | Regressão final (CI + E2E + Lighthouse) antes de entregar | 1 h |
 | **Total** | **~4–6 h** (folga confortável para entregar amanhã) |
 
 ### 💡 Melhorias identificadas (pós-entrega / se aparecer bug)
 
-- **§7 aviso de preço alterado no carrinho**: `Quote.changes` já está tipado e o endpoint `quote` existe, mas o aviso não é exibido no `cart.tsx` (faltam chaves i18n + o bloco na UI). Cobre o cenário "preço alterado ou edição esgotada" de forma mais explícita.
-- **35 chaves i18n** definidas e não usadas (auditei com script; ex.: `home.categories.*`, `account.activity`, `nft.reviews`).
-- **6 warnings** `react-refresh/only-export-components` no ESLint.
-- **§9 regressão visual E2E**: o config já aponta `snapshotDir`, mas nenhum `toHaveScreenshot` foi escrito — gerar baselines de home/detalhe/carrinho.
+- ✅ **§7 aviso de preço alterado no carrinho** _(concluído)_: banner com i18n nos 3 idiomas em `cart.tsx`, alimentado por `Quote.changes`; revalidado a cada mudança de carrinho e no evento `nft.updated`. Coberto por E2E (`e2e/flows.spec.ts`).
+- ✅ **Chaves i18n mortas** _(concluído)_: auditadas com `scripts/i18n-audit.mjs` e **15 removidas** dos 3 locales (317 no total). As demais candidatas (`home.categories.*`, `support.*`, `account.*`) eram usos dinâmicos legítimos.
+- ✅ **§9 regressão visual E2E** _(concluído)_: `e2e/visual.spec.ts` com baselines versionadas (`e2e/__screenshots__`) de início, detalhe, carrinho e checkout (desktop + mobile). Rodar/atualizar: `npm run test:e2e:visual [-- --update-snapshots]`.
+- **8 warnings** `react-refresh/only-export-components` no ESLint.
 - **`uses-responsive-images`** no Lighthouse: só existem variantes 640/1280 das artes; gerar 320/480 economiza ~70 ms.
 - **~19 erros de lint antigos** em `checkout.tsx` (hooks após early return), `catalog.tsx`/`nft-detail-page.tsx` (setState em effect) e outros — aguardando a limpeza final; não afetam build/typecheck/E2E.
 - **`unused-javascript`/`bf-cache`** (~300 ms): inerentes ao build de demonstração com MSW — não há o que fazer sem abrir mão dos mocks em produção.

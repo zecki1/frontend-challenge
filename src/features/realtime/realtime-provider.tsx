@@ -52,6 +52,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       )
       void queryClient.invalidateQueries({ queryKey: queryKeys.nfts.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.cart })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.quote.all })
     }
 
     const onOrderUpdated = (event: OrderUpdatedEvent) => {

@@ -9,18 +9,15 @@
     "sair": "Salir",
     "carrinho": "Carrito",
     "perfil": "Perfil",
-    "carteiras": "Carteras",
     "favorites": "Favoritos",
     "mobileTabs": "Navegación principal",
     "userMenu": "Menú de usuario",
     "scanQr": "Escanear código QR"
   },
   "common": {
-    "loading": "Cargando…",
     "retry": "Intentar de nuevo",
     "error": "Ocurrió un error",
     "empty": "Nada por aquí todavía",
-    "explore": "Explorar",
     "seeMore": "Leer más",
     "language": "Idioma",
     "close": "Cerrar"
@@ -87,9 +84,7 @@
     },
     "pagination": {
       "nav": "Paginación",
-      "previous": "Anterior",
-      "next": "Siguiente",
-      "page": "Página {{page}} de {{total}}"
+      "next": "Siguiente"
     },
     "priceRangeLabel": "Precio: {{min}} - {{max}} ETH",
     "searchPlaceholder": "Explorar colecciones",
@@ -109,9 +104,7 @@
     "marketplaceSubtitle": "Descubre NFTs seleccionados de creadores de todo el mundo y colecciona arte digital verificado."
   },
   "nft": {
-    "available": "{{count}} disponibles",
     "soldOut": "Agotado",
-    "editions": "Ediciones",
     "quantity": "Cantidad",
     "addToCart": "Añadir al carrito",
     "adding": "Añadiendo…",
@@ -125,7 +118,6 @@
     "notFoundText": "El identificador indicado no corresponde a ningún NFT.",
     "backToCatalog": "Volver al catálogo",
     "related": "Los coleccionistas también vieron",
-    "reviews": "Reseñas de coleccionistas",
     "badgeRarity": "RARO",
     "decrease": "Disminuir cantidad",
     "increase": "Aumentar cantidad",
@@ -159,7 +151,6 @@
   },
   "auth": {
     "loginTitle": "Iniciar sesión",
-    "loginSubtitle": "Inicia sesión para gestionar tu cartera, colección y perfil de creador.",
     "registerTitle": "Crear cuenta",
     "registerSubtitle": "Crea tu perfil de coleccionista y conecta una cartera cuando quieras.",
     "name": "Nombre visible",
@@ -181,8 +172,7 @@
     "noAccount": "¿Nuevo en Kurio?",
     "createAccountLink": "Crea una cuenta",
     "hasAccount": "¿Ya tienes una cuenta?",
-    "loginLink": "Inicia sesión",
-    "loggedInAs": "Conectado como {{name}}"
+    "loginLink": "Inicia sesión"
   },
   "footer": {
     "tagline": "Hecho para coleccionistas,\ncreadores y cultura",
@@ -243,7 +233,6 @@
     "total": "Total",
     "couponPlaceholder": "Ingresa el código promocional...",
     "apply": "Aplicar",
-    "goToCheckout": "Ir al pago",
     "remove": "Eliminar",
     "heading": "Carrito de NFT",
     "price": "Precio",
@@ -251,18 +240,25 @@
     "walletSummary": "Resumen de la billetera",
     "promoCode": "Código promocional",
     "estimatedFee": "Tarifa estimada",
-    "editionLabel": "Edición: {{edition}}"
+    "editionLabel": "Edición: {{edition}}",
+    "changes": {
+      "title": "Tu carrito se actualizó",
+      "item": "Un artículo del carrito",
+      "priceChanged": "El precio de {{name}} cambió de {{from}} a {{to}}.",
+      "priceChangedGeneric": "El precio de {{name}} cambió.",
+      "outOfStock": "El stock de {{name}} cambió. Revisa la cantidad o elimina el artículo.",
+      "editionUnavailable": "{{name}} ya no está disponible y se eliminó de la cotización.",
+      "couponInvalid": "El cupón {{code}} no es válido.",
+      "couponExpired": "El cupón {{code}} caducó."
+    }
   },
   "checkout": {
     "title": "Pago",
-    "collectorData": "Datos del coleccionista",
     "walletAndNetwork": "Cartera y red",
     "selectWallet": "Selecciona una cartera",
     "selectNetwork": "Selecciona una red",
     "confirmPurchase": "Confirmar compra",
     "connectAndFinish": "Conectar y finalizar",
-    "review": "Revisar pedido",
-    "summary": "Resumen de la cartera",
     "yourNfts": "Tus NFTs",
     "promoPrompt": "¿Tienes un código promocional? Aplícalo aquí",
     "networkLabel": "Rede",
@@ -280,7 +276,6 @@
     "supportedBrands": "METAMASK  •  WALLETCONNECT  •  COINBASE"
   },
   "orders": {
-    "confirmationTitle": "Pedido confirmado",
     "pendingTitle": "Procesando pedido",
     "rejectedTitle": "Pago rechazado",
     "total": "Total",
