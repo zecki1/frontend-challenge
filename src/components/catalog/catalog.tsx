@@ -164,7 +164,7 @@ export function CatalogSection(props: CatalogProps) {
                 className="mt-10 flex h-[35px] items-center justify-end gap-2"
               />
             </>
-          ) : props.data && Array.isArray(props.data.items) && props.data.items.length > 0 ? (
+          ) : props.data && Array.isArray(props.data.items) && props.data.items.length === 0 ? (
             <p className="rounded-lg border border-dashed border-kurio-surface p-8 text-center text-sm text-kurio-sand">
               {t('common.empty')}
             </p>
