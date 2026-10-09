@@ -3,15 +3,14 @@ import ReactDOM from 'react-dom/client'
 import './index.css'
 import './i18n'
 import { enableMocking } from './mocks'
+import { setMswReady } from '@/lib/msw-ready'
 
 /**
- * Os mocks são ativados por configuração (dev/demonstração) antes do primeiro
- * request. O app é importado dinamicamente *após* o MSW subir, para que o
- * `engine.io-client` capture o `WebSocket` já interceptado.
+ * O app é renderizado imediatamente (sem esperar o MSW) para que o hero e a
+ * imagem LCP apareçam o mais cedo possível. O MSW é ativado em background e,
+ * quando pronto, as queries de API são habilitadas automaticamente.
  */
 async function bootstrap(): Promise<void> {
-  await enableMocking()
-
   const [{ RouterProvider }, { router }, { AppProviders }] = await Promise.all([
     import('@tanstack/react-router'),
     import('./app/router'),
@@ -25,6 +24,10 @@ async function bootstrap(): Promise<void> {
       </AppProviders>
     </React.StrictMode>,
   )
+
+  // Ativa o MSW em background — não bloqueia o render inicial
+  await enableMocking()
+  setMswReady()
 }
 
 void bootstrap()

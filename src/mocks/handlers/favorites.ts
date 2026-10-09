@@ -1,7 +1,7 @@
 import { http } from 'msw'
 import type { FavoritesResponse } from '@/api/types'
 import { env } from '@/lib/env'
-import { getDb, persistDb } from '../db'
+import { getDb, persistDb, recordActivity } from '../db'
 import { applyNetworkConditions, jsonOk, requireUser } from './utils'
 
 const API = env.apiUrl
@@ -31,6 +31,7 @@ export const favoriteHandlers = [
     const favorites = favoritesFor(user.id)
     if (!favorites.includes(nftId)) favorites.push(nftId)
     persistDb()
+    recordActivity(user.id, nftId, 'favorite')
     return jsonOk<FavoritesResponse>({ nftIds: favorites })
   }),
 

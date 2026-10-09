@@ -23,12 +23,12 @@ export function SocialButtons() {
   }
 
   return (
-    <div className="flex w-full gap-3">
+    <div className="flex w-full flex-col gap-2">
       <button
         type="button"
         onClick={() => handleSocial('google')}
         disabled={mutation.isPending}
-        className="flex h-11 flex-1 items-center justify-center gap-2 rounded-md border border-kurio-surface bg-kurio-surface2 text-sm text-kurio-cream transition-colors hover:border-kurio-copper disabled:opacity-50"
+        className="flex h-11 w-full items-center justify-center gap-2 rounded-md border border-kurio-surface   text-sm text-kurio-cream transition-colors hover:border-kurio-copper disabled:opacity-50"
       >
         <FcGoogle aria-hidden className="h-5 w-5" />
         {t('auth.google')}
@@ -37,7 +37,7 @@ export function SocialButtons() {
         type="button"
         onClick={() => handleSocial('facebook')}
         disabled={mutation.isPending}
-        className="flex h-11 flex-1 items-center justify-center gap-2 rounded-md border border-kurio-surface bg-kurio-surface2 text-sm text-kurio-cream transition-colors hover:border-kurio-copper disabled:opacity-50"
+        className="flex h-11 w-full items-center justify-center gap-2 rounded-md border border-kurio-surface  text-sm text-kurio-cream transition-colors hover:border-kurio-copper disabled:opacity-50"
       >
         <FaFacebookF aria-hidden className="h-5 w-5 text-kurio-copper" />
         {t('auth.facebook')}

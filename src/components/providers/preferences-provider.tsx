@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { ThemeProvider as NextThemesProvider, useTheme as useNextTheme } from "next-themes";
+import { ThemeProvider, useThemeContext } from "./theme-provider";
 
 // Tipagens
 type Language = "pt" | "en" | "es";
@@ -16,20 +16,23 @@ interface PreferencesContextType {
     fontFamily: FontFamily;
     setFontFamily: (font: FontFamily) => void;
     theme: string | undefined;
-    setTheme: (theme: string) => void;
+    setTheme: (theme: 'light' | 'dark' | 'system') => void;
+    vlibras: boolean;
+    setVlibras: (enabled: boolean) => void;
 }
 
 const PreferencesContext = createContext<PreferencesContextType | undefined>(undefined);
 
 // Wrapper interno que usa o contexto
 function PreferencesProviderContent({ children }: { children: React.ReactNode }) {
-    const { theme, setTheme } = useNextTheme();
+    const { theme, setTheme } = useThemeContext();
 
     // Estados
     const [language, setLanguageState] = useState<Language>("pt");
     const [accessibilityMode, setAccessibilityModeState] = useState<AccessibilityMode>("none");
     const [fontSize, setFontSizeState] = useState<number>(16);
     const [fontFamily, setFontFamilyState] = useState<FontFamily>("default");
+    const [vlibras, setVlibrasState] = useState(false);
     const [mounted, setMounted] = useState(false);
 
     // Carregamento inicial
@@ -39,11 +42,13 @@ function PreferencesProviderContent({ children }: { children: React.ReactNode })
             const savedMode = localStorage.getItem("pref-mode") as AccessibilityMode;
             const savedSize = localStorage.getItem("pref-size");
             const savedFont = localStorage.getItem("pref-font") as FontFamily;
+            const savedVlibras = localStorage.getItem("pref-vlibras") === "true";
 
             if (savedLang) setLanguageState(savedLang);
             if (savedMode) setAccessibilityModeState(savedMode);
             if (savedSize) setFontSizeState(Number(savedSize));
             if (savedFont) setFontFamilyState(savedFont);
+            setVlibrasState(savedVlibras);
 
             setMounted(true);
         }, 0);
@@ -76,10 +81,7 @@ function PreferencesProviderContent({ children }: { children: React.ReactNode })
     const setAccessibilityMode = (m: AccessibilityMode) => { setAccessibilityModeState(m); localStorage.setItem("pref-mode", m); };
     const setFontSize = (s: number) => { setFontSizeState(s); localStorage.setItem("pref-size", s.toString()); };
     const setFontFamily = (f: FontFamily) => { setFontFamilyState(f); localStorage.setItem("pref-font", f); };
-
-    if (!mounted) {
-        return <div className="min-h-screen bg-background" />;
-    }
+    const setVlibras = (v: boolean) => { setVlibrasState(v); localStorage.setItem("pref-vlibras", v.toString()); };
 
     return (
         <PreferencesContext.Provider value={{
@@ -87,7 +89,8 @@ function PreferencesProviderContent({ children }: { children: React.ReactNode })
             accessibilityMode, setAccessibilityMode,
             fontSize, setFontSize,
             fontFamily, setFontFamily,
-            theme, setTheme
+            theme, setTheme,
+            vlibras, setVlibras
         }}>
             {children}
         </PreferencesContext.Provider>
@@ -97,11 +100,11 @@ function PreferencesProviderContent({ children }: { children: React.ReactNode })
 // Wrapper Principal que inclui o ThemeProvider
 export function PreferencesProvider({ children }: { children: React.ReactNode }) {
     return (
-        <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider>
             <PreferencesProviderContent>
                 {children}
             </PreferencesProviderContent>
-        </NextThemesProvider>
+        </ThemeProvider>
     );
 }
 // eslint-disable-next-line react-refresh/only-export-components

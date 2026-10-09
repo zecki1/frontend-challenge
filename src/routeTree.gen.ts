@@ -16,8 +16,15 @@ import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MercadoRouteImport } from './routes/mercado'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as AccountIndexRouteImport } from './routes/account.index'
+import { Route as AccountAccessibilityRouteImport } from './routes/account.accessibility'
+import { Route as AccountActivityRouteImport } from './routes/account.activity'
+import { Route as AccountLanguageRouteImport } from './routes/account.language'
+import { Route as AccountOffersRouteImport } from './routes/account.offers'
 import { Route as AccountProfileRouteImport } from './routes/account.profile'
+import { Route as AccountSupportRouteImport } from './routes/account.support'
 import { Route as AccountWalletsRouteImport } from './routes/account.wallets'
+import { Route as AccountWatchlistRouteImport } from './routes/account.watchlist'
 import { Route as MercadoIndexRouteImport } from './routes/mercado.index'
 import { Route as NftsNftIdRouteImport } from './routes/nfts.$nftId'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
@@ -58,14 +65,49 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountIndexRoute = AccountIndexRouteImport.update({
+  id: '/account/',
+  path: '/account/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountAccessibilityRoute = AccountAccessibilityRouteImport.update({
+  id: '/account/accessibility',
+  path: '/account/accessibility',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountActivityRoute = AccountActivityRouteImport.update({
+  id: '/account/activity',
+  path: '/account/activity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountLanguageRoute = AccountLanguageRouteImport.update({
+  id: '/account/language',
+  path: '/account/language',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountOffersRoute = AccountOffersRouteImport.update({
+  id: '/account/offers',
+  path: '/account/offers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccountProfileRoute = AccountProfileRouteImport.update({
   id: '/account/profile',
   path: '/account/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountSupportRoute = AccountSupportRouteImport.update({
+  id: '/account/support',
+  path: '/account/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccountWalletsRoute = AccountWalletsRouteImport.update({
   id: '/account/wallets',
   path: '/account/wallets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountWatchlistRoute = AccountWatchlistRouteImport.update({
+  id: '/account/watchlist',
+  path: '/account/watchlist',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MercadoIndexRoute = MercadoIndexRouteImport.update({
@@ -97,10 +139,17 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/mercado': typeof MercadoRouteWithChildren
   '/register': typeof RegisterRoute
+  '/account/accessibility': typeof AccountAccessibilityRoute
+  '/account/activity': typeof AccountActivityRoute
+  '/account/language': typeof AccountLanguageRoute
+  '/account/offers': typeof AccountOffersRoute
   '/account/profile': typeof AccountProfileRoute
+  '/account/support': typeof AccountSupportRoute
   '/account/wallets': typeof AccountWalletsRoute
+  '/account/watchlist': typeof AccountWatchlistRoute
   '/nfts/$nftId': typeof NftsNftIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
+  '/account/': typeof AccountIndexRoute
   '/mercado/': typeof MercadoIndexRoute
   '/mercado/nft/$nftNumber': typeof MercadoNftNftNumberRoute
 }
@@ -111,10 +160,17 @@ export interface FileRoutesByTo {
   '/favorites': typeof FavoritesRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/account/accessibility': typeof AccountAccessibilityRoute
+  '/account/activity': typeof AccountActivityRoute
+  '/account/language': typeof AccountLanguageRoute
+  '/account/offers': typeof AccountOffersRoute
   '/account/profile': typeof AccountProfileRoute
+  '/account/support': typeof AccountSupportRoute
   '/account/wallets': typeof AccountWalletsRoute
+  '/account/watchlist': typeof AccountWatchlistRoute
   '/nfts/$nftId': typeof NftsNftIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
+  '/account': typeof AccountIndexRoute
   '/mercado': typeof MercadoIndexRoute
   '/mercado/nft/$nftNumber': typeof MercadoNftNftNumberRoute
 }
@@ -127,10 +183,17 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/mercado': typeof MercadoRouteWithChildren
   '/register': typeof RegisterRoute
+  '/account/accessibility': typeof AccountAccessibilityRoute
+  '/account/activity': typeof AccountActivityRoute
+  '/account/language': typeof AccountLanguageRoute
+  '/account/offers': typeof AccountOffersRoute
   '/account/profile': typeof AccountProfileRoute
+  '/account/support': typeof AccountSupportRoute
   '/account/wallets': typeof AccountWalletsRoute
+  '/account/watchlist': typeof AccountWatchlistRoute
   '/nfts/$nftId': typeof NftsNftIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
+  '/account/': typeof AccountIndexRoute
   '/mercado/': typeof MercadoIndexRoute
   '/mercado/nft/$nftNumber': typeof MercadoNftNftNumberRoute
 }
@@ -144,10 +207,17 @@ export interface FileRouteTypes {
     | '/login'
     | '/mercado'
     | '/register'
+    | '/account/accessibility'
+    | '/account/activity'
+    | '/account/language'
+    | '/account/offers'
     | '/account/profile'
+    | '/account/support'
     | '/account/wallets'
+    | '/account/watchlist'
     | '/nfts/$nftId'
     | '/orders/$orderId'
+    | '/account/'
     | '/mercado/'
     | '/mercado/nft/$nftNumber'
   fileRoutesByTo: FileRoutesByTo
@@ -158,10 +228,17 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/login'
     | '/register'
+    | '/account/accessibility'
+    | '/account/activity'
+    | '/account/language'
+    | '/account/offers'
     | '/account/profile'
+    | '/account/support'
     | '/account/wallets'
+    | '/account/watchlist'
     | '/nfts/$nftId'
     | '/orders/$orderId'
+    | '/account'
     | '/mercado'
     | '/mercado/nft/$nftNumber'
   id:
@@ -173,10 +250,17 @@ export interface FileRouteTypes {
     | '/login'
     | '/mercado'
     | '/register'
+    | '/account/accessibility'
+    | '/account/activity'
+    | '/account/language'
+    | '/account/offers'
     | '/account/profile'
+    | '/account/support'
     | '/account/wallets'
+    | '/account/watchlist'
     | '/nfts/$nftId'
     | '/orders/$orderId'
+    | '/account/'
     | '/mercado/'
     | '/mercado/nft/$nftNumber'
   fileRoutesById: FileRoutesById
@@ -189,10 +273,17 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MercadoRoute: typeof MercadoRouteWithChildren
   RegisterRoute: typeof RegisterRoute
+  AccountAccessibilityRoute: typeof AccountAccessibilityRoute
+  AccountActivityRoute: typeof AccountActivityRoute
+  AccountLanguageRoute: typeof AccountLanguageRoute
+  AccountOffersRoute: typeof AccountOffersRoute
   AccountProfileRoute: typeof AccountProfileRoute
+  AccountSupportRoute: typeof AccountSupportRoute
   AccountWalletsRoute: typeof AccountWalletsRoute
+  AccountWatchlistRoute: typeof AccountWatchlistRoute
   NftsNftIdRoute: typeof NftsNftIdRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
+  AccountIndexRoute: typeof AccountIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -246,6 +337,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account/': {
+      id: '/account/'
+      path: '/account'
+      fullPath: '/account/'
+      preLoaderRoute: typeof AccountIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/accessibility': {
+      id: '/account/accessibility'
+      path: '/account/accessibility'
+      fullPath: '/account/accessibility'
+      preLoaderRoute: typeof AccountAccessibilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/activity': {
+      id: '/account/activity'
+      path: '/account/activity'
+      fullPath: '/account/activity'
+      preLoaderRoute: typeof AccountActivityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/language': {
+      id: '/account/language'
+      path: '/account/language'
+      fullPath: '/account/language'
+      preLoaderRoute: typeof AccountLanguageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/offers': {
+      id: '/account/offers'
+      path: '/account/offers'
+      fullPath: '/account/offers'
+      preLoaderRoute: typeof AccountOffersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/account/profile': {
       id: '/account/profile'
       path: '/account/profile'
@@ -253,11 +379,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account/support': {
+      id: '/account/support'
+      path: '/account/support'
+      fullPath: '/account/support'
+      preLoaderRoute: typeof AccountSupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/account/wallets': {
       id: '/account/wallets'
       path: '/account/wallets'
       fullPath: '/account/wallets'
       preLoaderRoute: typeof AccountWalletsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/watchlist': {
+      id: '/account/watchlist'
+      path: '/account/watchlist'
+      fullPath: '/account/watchlist'
+      preLoaderRoute: typeof AccountWatchlistRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mercado/': {
@@ -312,10 +452,17 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MercadoRoute: MercadoRouteWithChildren,
   RegisterRoute: RegisterRoute,
+  AccountAccessibilityRoute: AccountAccessibilityRoute,
+  AccountActivityRoute: AccountActivityRoute,
+  AccountLanguageRoute: AccountLanguageRoute,
+  AccountOffersRoute: AccountOffersRoute,
   AccountProfileRoute: AccountProfileRoute,
+  AccountSupportRoute: AccountSupportRoute,
   AccountWalletsRoute: AccountWalletsRoute,
+  AccountWatchlistRoute: AccountWatchlistRoute,
   NftsNftIdRoute: NftsNftIdRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
+  AccountIndexRoute: AccountIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

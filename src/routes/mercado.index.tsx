@@ -9,6 +9,7 @@ import {
   TAB_SORTS,
   type CatalogSearch,
 } from '@/components/catalog/catalog'
+import { useMswReady } from '@/lib/msw-ready'
 
 export const Route = createFileRoute('/mercado/')({
   validateSearch: (search): CatalogSearch => {
@@ -38,10 +39,13 @@ function MarketplacePage() {
     pageSize: 9,
   }
 
+  const mswReady = useMswReady()
+
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: queryKeys.nfts.list(params),
     queryFn: ({ signal }) => nftsApi.list(params, signal),
     placeholderData: (previous) => previous,
+    enabled: mswReady,
   })
 
   const updateSearch = (patch: Partial<CatalogSearch>) => {

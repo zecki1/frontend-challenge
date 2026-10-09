@@ -2,9 +2,9 @@ import { http } from 'msw'
 import type { Nft, NftCategory, NftRarity, NftSort, Paginated } from '@/api/types'
 import { compareEth } from '@/lib/decimal'
 import { env } from '@/lib/env'
-import { getDb } from '../db'
+import { currentUser, getDb, recordActivity } from '../db'
 import { scenario } from '../config'
-import { applyNetworkConditions, jsonError, jsonOk } from './utils'
+import { applyNetworkConditions, getBearerToken, jsonError, jsonOk } from './utils'
 
 const API = env.apiUrl
 
@@ -118,13 +118,19 @@ export const nftHandlers = [
     return jsonOk(paginated)
   }),
 
-  http.get(`${API}/nfts/:id`, async ({ params }) => {
+  http.get(`${API}/nfts/:id`, async ({ params, request }) => {
     const gate = await applyNetworkConditions()
     if (gate) return gate
-    const nft = getDb().nfts.find((item) => item.id === params.id)
+    const requestedId = Array.isArray(params.id) ? params.id[0] : params.id
+    // Aceita tanto "001" quanto "nft-001"
+    const normalizedId = requestedId.startsWith('nft-') ? requestedId : `nft-${requestedId}`
+    const nft = getDb().nfts.find((item) => item.id === normalizedId)
     if (!nft) {
       return jsonError(404, 'not_found', 'NFT não encontrado.')
     }
+    // Atividade: registro de visualização para usuários autenticados
+    const viewer = currentUser(getBearerToken(request))
+    if (viewer) recordActivity(viewer.id, nft.id, 'view')
     return jsonOk(nft)
   }),
 ]

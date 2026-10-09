@@ -1,12 +1,14 @@
 import { useState, type MouseEvent } from 'react'
-import { Link } from '@tanstack/react-router'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { cartApi, queryKeys } from '@/api'
+import { cartApi, favoritesApi, queryKeys } from '@/api'
 import type { Nft, NftCategory, NftSort } from '@/api'
 import { formatEth } from '@/lib/decimal'
+import { useAuth } from '@/features/auth/auth-context'
+import { useMswReady } from '@/lib/msw-ready'
 
 export const TAB_SORTS: Record<'all' | 'new' | 'trending', NftSort> = {
   all: 'recent',
@@ -352,10 +354,21 @@ export function FeaturedBanner() {
 
 export function NftCard({ nft, showRarityBadge = false }: { nft: Nft; showRarityBadge?: boolean }) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
+  const mswReady = useMswReady()
   const art640 = nft.imageUrl.replace('-1280', '-640')
-  // Extrair número do ID (ex: "nft-001" -> "001")
   const nftNumber = nft.id.replace('nft-', '')
   const queryClient = useQueryClient()
+
+  // Query para verificar se é favorito
+  const { data: favorites } = useQuery({
+    queryKey: queryKeys.favorites,
+    queryFn: ({ signal }) => favoritesApi.list(signal),
+    enabled: mswReady && isAuthenticated,
+  })
+  const isFavorite = isAuthenticated && (favorites?.nftIds.includes(nft.id) ?? false)
+
   const addToCart = useMutation({
     mutationFn: (editionId: string) =>
       cartApi.addItem({ nftId: nft.id, editionId, quantity: 1 }),
@@ -368,12 +381,46 @@ export function NftCard({ nft, showRarityBadge = false }: { nft: Nft; showRarity
     },
   })
 
+  const toggleFavorite = useMutation({
+    mutationFn: () => (isFavorite ? favoritesApi.remove(nft.id) : favoritesApi.add(nft.id)),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.favorites })
+      const previous = queryClient.getQueryData<{ nftIds: string[] }>(queryKeys.favorites)
+      queryClient.setQueryData<{ nftIds: string[] }>(queryKeys.favorites, (old) =>
+        old
+          ? {
+              nftIds: isFavorite
+                ? old.nftIds.filter((id) => id !== nft.id)
+                : [...old.nftIds, nft.id],
+            }
+          : old,
+      )
+      return { previous }
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previous) queryClient.setQueryData(queryKeys.favorites, context.previous)
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.favorites })
+    },
+  })
+
   const handleAddToCart = (event: MouseEvent) => {
     event.preventDefault()
     event.stopPropagation()
     const edition =
       nft.editions.find((entry) => entry.available > 0) ?? nft.editions[0]
     if (edition) addToCart.mutate(edition.id)
+  }
+
+  const handleToggleFavorite = (event: MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    if (!isAuthenticated) {
+      void navigate({ to: '/login', search: { redirect: `/mercado/nft/${nftNumber}` } })
+      return
+    }
+    toggleFavorite.mutate()
   }
   return (
     <li data-aos="fade-up" className="group">
@@ -412,11 +459,20 @@ export function NftCard({ nft, showRarityBadge = false }: { nft: Nft; showRarity
             </button>
             <button
               type="button"
-              aria-label={t('nft.favorite')}
-              onClick={(event) => event.preventDefault()}
-              className="flex h-7 w-7 items-center justify-center rounded-lg bg-kurio-surface2/90 text-kurio-cream transition-colors hover:text-kurio-coral md:h-9 md:w-9"
+              aria-label={isFavorite ? t('nft.unfavorite') : t('nft.favorite')}
+              onClick={handleToggleFavorite}
+              className="flex h-7 w-7 items-center justify-center rounded-lg bg-kurio-surface2/90 transition-colors md:h-9 md:w-9"
+              style={{ color: isFavorite ? '#f87171' : 'inherit' }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill={isFavorite ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth={1.8}
+                aria-hidden
+              >
                 <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21.2l7.7-7.7 1.1-1a5.5 5.5 0 0 0 0-7.9z" />
               </svg>
             </button>

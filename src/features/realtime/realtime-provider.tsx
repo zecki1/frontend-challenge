@@ -5,20 +5,27 @@ import type { Nft, NftUpdatedEvent, Order, OrderUpdatedEvent } from '@/api'
 import { queryKeys } from '@/api'
 import { getSocket } from '@/lib/socket'
 import { useAuth } from '@/features/auth/auth-context'
+import { useMswReady } from '@/lib/msw-ready'
 
 /**
  * Conecta o `socket.io-client` apenas para usuários autenticados e sincroniza o
  * cache do TanStack Query com os eventos. Eventos duplicados/antigos são
  * descartados por versão. Após reconexão, reconcilia via REST.
+ *
+ * Espera o MSW estar pronto antes de conectar: o `socket.io-client` captura o
+ * `WebSocket` global no carregamento, e o MSW precisa estar pronto antes.
  */
 export function RealtimeProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
   const { isAuthenticated } = useAuth()
+  const mswReady = useMswReady()
 
   useEffect(() => {
-    if (!isAuthenticated) return
+    if (!isAuthenticated || !mswReady) return
 
-    const socket = getSocket()
+    let cancelled = false
+    let socket: Awaited<ReturnType<typeof getSocket>> | null = null
+
     const versions = new Map<string, number>()
 
     const shouldApply = (resourceId: string, version: number): boolean => {
@@ -66,23 +73,32 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       void queryClient.invalidateQueries({ queryKey: queryKeys.cart })
     }
 
-    // Reconciliação completa após (re)conexão.
     const onReconnect = () => {
       void queryClient.invalidateQueries()
     }
 
-    socket.on('nft.updated', onNftUpdated)
-    socket.on('order.updated', onOrderUpdated)
-    socket.on('connect', onReconnect)
-    if (!socket.connected) socket.connect()
+    void getSocket().then((s) => {
+      if (cancelled) {
+        s.disconnect()
+        return
+      }
+      socket = s
+      socket.on('nft.updated', onNftUpdated)
+      socket.on('order.updated', onOrderUpdated)
+      socket.on('connect', onReconnect)
+      if (!socket.connected) socket.connect()
+    })
 
     return () => {
-      socket.off('nft.updated', onNftUpdated)
-      socket.off('order.updated', onOrderUpdated)
-      socket.off('connect', onReconnect)
-      socket.disconnect()
+      cancelled = true
+      if (socket) {
+        socket.off('nft.updated', onNftUpdated)
+        socket.off('order.updated', onOrderUpdated)
+        socket.off('connect', onReconnect)
+        socket.disconnect()
+      }
     }
-  }, [isAuthenticated, queryClient])
+  }, [isAuthenticated, mswReady, queryClient])
 
   return <>{children}</>
 }

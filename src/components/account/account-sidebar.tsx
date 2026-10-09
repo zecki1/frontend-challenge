@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
+  Accessibility,
   Activity,
   AlertTriangle,
   Download,
+  Globe,
   Heart,
   LogOut,
   MapPin,
@@ -19,6 +21,8 @@ type SidebarItemId =
   | "watchlist"
   | "offers"
   | "downloads"
+  | "idioma"
+  | "acessibilidade"
   | "support";
 
 const items: {
@@ -26,7 +30,15 @@ const items: {
   key: string;
   icon: typeof User;
   size: string;
-  to?: "/account/profile" | "/account/wallets";
+  to?:
+    | "/account/profile"
+    | "/account/wallets"
+    | "/account/language"
+    | "/account/accessibility"
+    | "/account/activity"
+    | "/account/watchlist"
+    | "/account/offers"
+    | "/account/support";
 }[] = [
   {
     id: "profile",
@@ -42,11 +54,25 @@ const items: {
     size: "size-5",
     to: "/account/wallets",
   },
-  { id: "activity", key: "activity", icon: ShoppingBag, size: "size-[18px]" },
-  { id: "watchlist", key: "watchlist", icon: Heart, size: "size-4" },
-  { id: "offers", key: "offers", icon: Activity, size: "size-[18px]" },
+  { id: "activity", key: "activity", icon: ShoppingBag, size: "size-[18px]", to: "/account/activity" },
+  { id: "watchlist", key: "watchlist", icon: Heart, size: "size-4", to: "/account/watchlist" },
+  { id: "offers", key: "offers", icon: Activity, size: "size-[18px]", to: "/account/offers" },
   { id: "downloads", key: "downloads", icon: Download, size: "size-[18px]" },
-  { id: "support", key: "support", icon: AlertTriangle, size: "size-[18px]" },
+  {
+    id: "acessibilidade",
+    key: "accessibility",
+    icon: Accessibility,
+    size: "size-[18px]",
+    to: "/account/accessibility",
+  },
+  {
+    id: "idioma",
+    key: "language",
+    icon: Globe,
+    size: "size-[18px]",
+    to: "/account/language",
+  },
+  { id: "support", key: "support", icon: AlertTriangle, size: "size-[18px]", to: "/account/support" },
 ];
 
 export function AccountSidebar({ active }: { active: SidebarItemId }) {

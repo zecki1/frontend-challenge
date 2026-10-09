@@ -6,6 +6,7 @@ import { ArrowLeft, Minus, Plus, Trash2 } from 'lucide-react'
 import { cartApi, nftsApi, queryKeys } from '@/api'
 import { addEth, formatEth, mulEth } from '@/lib/decimal'
 import type { CartItem } from '@/api/types'
+import { useMswReady } from '@/lib/msw-ready'
 
 export const Route = createFileRoute('/cart')({
   component: CartPage,
@@ -14,12 +15,14 @@ export const Route = createFileRoute('/cart')({
 function CartPage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
+  const mswReady = useMswReady()
   const couponDesktopRef = useRef<HTMLInputElement>(null)
   const couponMobileRef = useRef<HTMLInputElement>(null)
 
   const { data: cart, isLoading, isError, error } = useQuery({
     queryKey: queryKeys.cart,
     queryFn: ({ signal }) => cartApi.get(signal),
+    enabled: mswReady,
   })
 
   const updateItem = useMutation({
@@ -389,10 +392,12 @@ function CartPage() {
 
 function EditionLabel({ nftId, editionId }: { nftId: string; editionId: string }) {
   const { t } = useTranslation()
+  const mswReady = useMswReady()
   const { data: nft } = useQuery({
     queryKey: queryKeys.nfts.detail(nftId),
     queryFn: ({ signal }) => nftsApi.detail(nftId, signal),
     staleTime: 60_000,
+    enabled: mswReady,
   })
 
   const edition = nft?.editions.find((entry) => entry.id === editionId)
@@ -409,9 +414,11 @@ function EditionLabel({ nftId, editionId }: { nftId: string; editionId: string }
 
 function RelatedProducts() {
   const { t } = useTranslation()
+  const mswReady = useMswReady()
   const { data } = useQuery({
     queryKey: queryKeys.nfts.list({ page: 1, pageSize: 5, sort: 'recent' }),
     queryFn: ({ signal }) => nftsApi.list({ page: 1, pageSize: 5, sort: 'recent' }, signal),
+    enabled: mswReady,
   })
 
   const items = data?.items ?? []
@@ -426,7 +433,7 @@ function RelatedProducts() {
       <ul className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5 lg:gap-[26px]">
         {items.map((nft) => (
           <li key={nft.id} className="group">
-            <Link to="/nfts/$nftId" params={{ nftId: nft.id }} className="block">
+            <Link to="/mercado/nft/$nftNumber" params={{ nftNumber: nft.id.replace('nft-', '') }} className="block">
               <div className="h-[255px] overflow-hidden rounded-md bg-kurio-surface px-[14.5px] py-1.5">
                 <img
                   src={nft.imageUrl}

@@ -1,8 +1,10 @@
 import type {
+  ActivityEvent,
   Cart,
   Nft,
   Order,
   Profile,
+  SupportTicket,
   User,
   Wallet,
 } from '@/api/types'
@@ -34,11 +36,16 @@ export interface IdempotencyRecord {
   createdAt: string
 }
 
+/** Ticket de suporte persistido: OS + dono (para isolar lista por usuário). */
+export type SupportTicketRecord = SupportTicket & { userId: string }
+
 export interface MockState {
   users: MockUserRecord[]
   sessions: MockSession[]
   nfts: Nft[]
   favorites: Record<string, string[]>
+  /** userId -> eventos de atividade (visualização, favorito, carrinho, compra). */
+  userActivity: Record<string, ActivityEvent[]>
   carts: Record<string, Cart>
   wallets: Record<string, Wallet[]>
   orders: Order[]
@@ -46,6 +53,8 @@ export interface MockState {
   orderOwners: Record<string, string>
   idempotency: Record<string, IdempotencyRecord>
   coupons: SeedCoupon[]
+  /** Ordens de serviço abertas pelo widget de suporte. */
+  supportTickets: SupportTicketRecord[]
 }
 
 /* ------------------------------------------------------------------ *
@@ -183,12 +192,25 @@ function seedState(): MockState {
       'user-1': [nfts[0].id, nfts[4]?.id, nfts[11]?.id].filter(Boolean) as string[],
       'user-2': [],
     },
+    userActivity: {
+      // Atividade semente: visualizações + favoritos do usuário-1
+      'user-1': [
+        { id: uid('act'), nftId: nfts[0].id, action: 'view' as const, at: new Date(Date.now() - 86_400_000 * 2).toISOString() },
+        { id: uid('act'), nftId: nfts[0].id, action: 'favorite' as const, at: new Date(Date.now() - 86_400_000 * 2).toISOString() },
+        { id: uid('act'), nftId: nfts[1]?.id ?? nfts[0].id, action: 'view' as const, at: new Date(Date.now() - 86_400_000).toISOString() },
+        { id: uid('act'), nftId: nfts[2]?.id ?? nfts[0].id, action: 'cart' as const, at: new Date(Date.now() - 36_000_000).toISOString() },
+        { id: uid('act'), nftId: nfts[4]?.id ?? nfts[0].id, action: 'favorite' as const, at: new Date(Date.now() - 18_000_000).toISOString() },
+        { id: uid('act'), nftId: nfts[11]?.id ?? nfts[0].id, action: 'view' as const, at: new Date(Date.now() - 3_600_000).toISOString() },
+      ],
+      'user-2': [],
+    },
     carts: {},
     wallets,
     orders,
     orderOwners: { 'order-seed-1': 'user-1' },
     idempotency: {},
     coupons: seedCoupons,
+    supportTickets: [],
   }
 }
 
@@ -210,6 +232,11 @@ function readFromStorage(): MockState | null {
 export function getDb(): MockState {
   if (state) return state
   state = readFromStorage() ?? seedState()
+  // Migração: garante campos adicionados depois da v1 do storage
+  if (state) {
+    if (!state.userActivity) state.userActivity = {}
+    if (!state.supportTickets) state.supportTickets = []
+  }
   persistDb()
   return state
 }
@@ -226,6 +253,22 @@ export function persistDb(): void {
 /** Restaura integralmente o cenário semente conhecido. */
 export function resetDb(): void {
   state = seedState()
+  persistDb()
+}
+
+/**
+ * Registra uma interação do usuário com um NFT. Mantém apenas o evento mais
+ * recente por NFT (up-sert) e limita a lista aos últimos 30.
+ */
+export function recordActivity(userId: string, nftId: string, action: ActivityEvent['action']): void {
+  const db = getDb()
+  const events = db.userActivity[userId] ?? []
+  const withoutNft = events.filter((event) => event.nftId !== nftId)
+  const next: ActivityEvent[] = [
+    { id: uid('act'), nftId, action, at: new Date().toISOString() },
+    ...withoutNft,
+  ].slice(0, 30)
+  db.userActivity[userId] = next
   persistDb()
 }
 

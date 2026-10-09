@@ -18,6 +18,7 @@ import {
   accountInputClass,
   accountSelectClass,
 } from "@/components/account/account-field";
+import { useMswReady } from '@/lib/msw-ready'
 
 const profileSchema = z.object({
   name: z.string().min(2, "Informe um nome com pelo menos 2 caracteres."),
@@ -52,16 +53,22 @@ export const Route = createFileRoute("/account/profile")({
 function ProfilePage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const mswReady = useMswReady();
 
   const { data: profile, isLoading } = useQuery({
     queryKey: queryKeys.profile,
     queryFn: ({ signal }) => profileApi.get(signal),
+    enabled: mswReady,
   });
 
   const updateProfile = useMutation({
     mutationFn: (payload: { name: string; email: string }) =>
       profileApi.update(payload),
-    onSuccess: (data) => queryClient.setQueryData(queryKeys.profile, data),
+    onSuccess: (data) => {
+      queryClient.setQueryData(queryKeys.profile, data);
+      // Mantém header/checkout sincronizados com nome e e-mail atualizados
+      void queryClient.invalidateQueries({ queryKey: queryKeys.session });
+    },
   });
 
   const changePassword = useMutation({

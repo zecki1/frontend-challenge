@@ -5,6 +5,7 @@ import { queryClient } from '@/lib/query-client'
 import { AuthProvider } from '@/features/auth/auth-provider'
 import { RealtimeProvider } from '@/features/realtime/realtime-provider'
 import { SmoothScrollProvider } from '@/components/providers/smooth-scroll-provider'
+import { PreferencesProvider } from '@/components/providers/preferences-provider'
 import { Toaster } from '@/components/ui/sonner'
 
 export function AppProviders({ children }: { children: ReactNode }) {
@@ -12,8 +13,10 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <RealtimeProvider>
-          <SmoothScrollProvider>{children}</SmoothScrollProvider>
-          <Toaster />
+          <PreferencesProvider>
+            <SmoothScrollProvider>{children}</SmoothScrollProvider>
+            <Toaster />
+          </PreferencesProvider>
         </RealtimeProvider>
       </AuthProvider>
       {import.meta.env.DEV ? <ReactQueryDevtools initialIsOpen={false} /> : null}

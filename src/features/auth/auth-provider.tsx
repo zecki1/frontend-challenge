@@ -11,14 +11,16 @@ import {
 import { AUTH_EXPIRED_EVENT } from '@/lib/http'
 import { sessionToken } from '@/lib/session-token'
 import { AuthContext, type AuthContextValue } from './auth-context'
+import { useMswReady } from '@/lib/msw-ready'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
+  const mswReady = useMswReady()
 
   const sessionQuery = useQuery({
     queryKey: queryKeys.session,
     queryFn: ({ signal }) => sessionApi.me(signal),
-    enabled: Boolean(sessionToken.get()),
+    enabled: mswReady && Boolean(sessionToken.get()),
     retry: false,
     staleTime: 5 * 60_000,
   })

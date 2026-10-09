@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { favoritesApi, nftsApi, queryKeys } from '@/api'
 import { formatEth } from '@/lib/decimal'
 import { requireAuthBeforeLoad } from '@/features/auth/require-auth'
+import { useMswReady } from '@/lib/msw-ready'
 
 export const Route = createFileRoute('/favorites')({
   beforeLoad: requireAuthBeforeLoad,
@@ -12,15 +13,18 @@ export const Route = createFileRoute('/favorites')({
 
 function FavoritesPage() {
   const { t } = useTranslation()
+  const mswReady = useMswReady()
 
   const { data: favorites } = useQuery({
     queryKey: queryKeys.favorites,
     queryFn: ({ signal }) => favoritesApi.list(signal),
+    enabled: mswReady,
   })
 
   const { data: nfts } = useQuery({
     queryKey: queryKeys.nfts.list({ page: 1, pageSize: 48, sort: 'recent' }),
     queryFn: ({ signal }) => nftsApi.list({ page: 1, pageSize: 48, sort: 'recent' }, signal),
+    enabled: mswReady,
   })
 
   const favoriteNfts = (nfts?.items ?? []).filter((nft) =>
@@ -44,7 +48,7 @@ function FavoritesPage() {
         <ul className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
           {favoriteNfts.map((nft) => (
             <li key={nft.id} className="group">
-              <Link to="/nfts/$nftId" params={{ nftId: nft.id }} className="block">
+              <Link to="/mercado/nft/$nftNumber" params={{ nftNumber: nft.id.replace('nft-', '') }} className="block">
                 <div className="overflow-hidden rounded-xl border border-kurio-surface bg-kurio-surface/40">
                   <img
                     src={nft.imageUrl}

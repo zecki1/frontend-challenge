@@ -2,6 +2,8 @@ import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { KurioHeader } from '@/components/layout/kurio-header'
 import { KurioFooter } from '@/components/layout/kurio-footer'
+import { SupportWidget } from '@/components/support-widget'
+import { VlibrasWidget } from '@/components/vlibras-widget'
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -22,6 +24,8 @@ function RootLayout() {
         <Outlet />
       </main>
       <KurioFooter />
+      <SupportWidget />
+      <VlibrasWidget />
       {import.meta.env.DEV ? <TanStackRouterDevtools position="bottom-right" /> : null}
     </div>
   )

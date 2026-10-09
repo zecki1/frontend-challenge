@@ -1,25 +1,11 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/features/auth/auth-context'
 import { ApiError } from '@/lib/api-error'
 import { SocialButtons } from '@/components/auth/social-buttons'
-
-const registerSchema = z
-  .object({
-    name: z.string().min(2, 'Informe um nome com pelo menos 2 caracteres.'),
-    email: z.string().min(1, 'Informe o e-mail.').email('E-mail inválido.'),
-    password: z.string().min(8, 'A senha deve ter pelo menos 8 caracteres.'),
-    confirmPassword: z.string().min(1, 'Confirme a senha.'),
-  })
-  .refine((values) => values.password === values.confirmPassword, {
-    path: ['confirmPassword'],
-    message: 'As senhas não conferem.',
-  })
-
-type RegisterForm = z.infer<typeof registerSchema>
+import { registerSchema, type RegisterFormValues } from '@/features/auth/register-schema'
 
 export const Route = createFileRoute('/register')({
   component: RegisterPage,
@@ -30,7 +16,7 @@ function RegisterPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
 
-  const form = useForm<RegisterForm>({
+  const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
   })
@@ -47,7 +33,7 @@ function RegisterPage() {
       if (error instanceof ApiError && error.details) {
         for (const [field, messages] of Object.entries(error.details)) {
           if (field in values) {
-            form.setError(field as keyof RegisterForm, { message: messages[0] })
+            form.setError(field as keyof RegisterFormValues, { message: messages[0] })
           }
         }
       }

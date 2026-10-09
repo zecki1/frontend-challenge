@@ -5,6 +5,7 @@ import { HeartHandshake, X } from 'lucide-react'
 import { ordersApi, queryKeys, walletsApi } from '@/api'
 import { formatEth } from '@/lib/decimal'
 import { requireAuthBeforeLoad } from '@/features/auth/require-auth'
+import { useMswReady } from '@/lib/msw-ready'
 
 export const Route = createFileRoute('/orders/$orderId')({
   beforeLoad: requireAuthBeforeLoad,
@@ -28,14 +29,18 @@ function OrderConfirmationPage() {
   const { orderId } = Route.useParams()
   const { t, i18n } = useTranslation()
 
+  const mswReady = useMswReady()
+
   const { data: order, isLoading, isError } = useQuery({
     queryKey: queryKeys.orders.detail(orderId),
     queryFn: ({ signal }) => ordersApi.get(orderId, signal),
+    enabled: mswReady,
   })
 
   const { data: wallets } = useQuery({
     queryKey: queryKeys.wallets,
     queryFn: ({ signal }) => walletsApi.list(signal),
+    enabled: mswReady,
   })
 
   if (isLoading) {

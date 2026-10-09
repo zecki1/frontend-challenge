@@ -7,7 +7,7 @@ import {
   FaLinkedinIn,
   FaTwitter,
 } from 'react-icons/fa'
-import { sendNewsletterConfirmation } from '@/lib/email'
+import { subscribeNewsletter } from '@/lib/email'
 
 const SOCIAL: Array<{ label: string; Icon: typeof FaFacebookF }> = [
   { label: 'Facebook', Icon: FaFacebookF },
@@ -77,23 +77,23 @@ export function KurioFooter() {
     if (!email || emailStatus === 'loading') return
 
     setEmailStatus('loading')
-    const result = await sendNewsletterConfirmation(email)
+    const result = await subscribeNewsletter(email)
     setEmailStatus(result.success ? 'success' : 'error')
     if (result.success) setEmail('')
     setTimeout(() => setEmailStatus('idle'), 3000)
   }
 
   return (
-    <footer className="hidden border-t border-kurio-surface bg-kurio-bg md:block">
-      <div className="mx-auto max-w-content px-4 py-14 sm:px-6">
+    <footer className="hidden border-kurio-surface bg-kurio-bg md:block">
+      <div className="mx-auto max-w-content px-4 py-4 sm:px-6 bg-kurio-surface">
         {/* Faixa única: 3 features (service mark W/C/D) + newsletter — 4 colunas */}
-        <section className="grid gap-8 border-b border-kurio-surface pb-12 md:grid-cols-2 lg:grid-cols-[repeat(3,minmax(0,1fr))_1.35fr]">
+        <section className="grid gap-8 border-b border-kurio-surface md:grid-cols-2 lg:grid-cols-[repeat(3,minmax(0,1fr))_1.35fr]">
           {features.map((feature) => (
             <article
               key={feature.title}
-              className="border-kurio-surface lg:border-l lg:pl-6 lg:first:border-l-0 lg:first:pl-0"
+              className="lg:border-l lg:border-kurio-copper/40 lg:pl-6 lg:first:border-l-0 lg:first:pl-0 border-l-2 border-l-kurio-copper pl-4"
             >
-              <div className="mb-5 flex h-[74px] w-[74px] items-center justify-center rounded-xl border border-kurio-copper/30 bg-kurio-surface font-mono text-2xl font-bold text-kurio-copper">
+              <div className="mb-5 flex h-[74px] w-[74px] items-center justify-center rounded-full border border-kurio-copper/30 bg-kurio-copper font-mono text-2xl font-bold text-kurio-surface">
                 {feature.mark}
               </div>
               <h3 className="mb-3 font-mono text-sm font-bold text-kurio-cream">
@@ -105,7 +105,7 @@ export function KurioFooter() {
             </article>
           ))}
 
-          <div className="lg:border-l lg:border-kurio-surface lg:pl-6">
+          <div className="lg:border-l lg:border-kurio-copper/40 lg:pl-6 border-l-2 border-l-kurio-copper pl-4">
             <h2 className="mb-4 text-[24px] font-bold leading-tight text-kurio-cream">
               {t('footer.newsletter.title')}
             </h2>
@@ -141,27 +141,33 @@ export function KurioFooter() {
             </p>
           </div>
         </section>
+      </div>
 
-        {/* Linha da marca: KURIO · tagline · e-mail · telefone */}
-        <section className="grid gap-4 border-b border-kurio-surface py-7 sm:grid-cols-2 lg:grid-cols-4">
-          <p className="text-2xl font-bold tracking-[0.2em] text-kurio-cream">
-            {t('nav.brand')}
-          </p>
-          <p className="whitespace-pre-line text-sm text-kurio-sand">{t('footer.tagline')}</p>
-          <p className="text-sm text-kurio-sand">{t('footer.email')}</p>
-          <p className="text-sm text-kurio-sand">{t('footer.phone')}</p>
-        </section>
+    
+      <div className="mx-auto max-w-content ">
+        <div className="px-6 py-7 bg-[#38220f]">
+          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <p className="text-2xl font-bold tracking-[0.2em] text-white">
+              {t('nav.brand')}
+            </p>
+            <p className="whitespace-pre-line text-sm text-white">{t('footer.tagline')}</p>
+            <p className="text-sm text-white">{t('footer.email')}</p>
+            <p className="text-sm text-white">{t('footer.phone')}</p>
+          </section>
+        </div>
+      </div>
 
+      <div className="mx-auto max-w-content px-4 sm:px-6 bg-kurio-surface">
         {/* Colunas de links + (Redes sociais / Carteiras compatíveis) */}
         <section className="grid gap-8 py-10 md:grid-cols-2 lg:grid-cols-4">
           {columns.map((column) => (
             <nav key={column.title} aria-label={column.title} className="space-y-3">
-              <p className="text-sm font-bold text-kurio-cream">{column.title}</p>
+              <p className="text-sm font-bold text-white">{column.title}</p>
               <ul className="space-y-2">
                 {column.links.map((link) => (
                   <li key={link}>
                     <span
-                      className="cursor-not-allowed text-sm text-kurio-sand"
+                      className="cursor-not-allowed text-sm text-white"
                       title="Fora do escopo"
                     >
                       {link}
@@ -174,7 +180,7 @@ export function KurioFooter() {
 
           <div className="space-y-7">
             <div>
-              <p className="mb-3 text-sm font-bold text-kurio-cream">
+              <p className="mb-3 text-sm font-bold text-white">
                 {t('footer.columns.social')}
               </p>
               <ul className="flex gap-2">
@@ -194,16 +200,25 @@ export function KurioFooter() {
             </div>
 
             <div>
-              <p className="mb-2 text-sm font-bold text-kurio-cream">
+              <p className="mb-2 text-sm font-bold text-white">
                 {t('footer.walletsTitle')}
               </p>
-              <p className="text-xs tracking-wide text-kurio-sand">
-                METAMASK • WALLETCONNECT • COINBASE
-              </p>
+              <div className="inline-flex items-center rounded-md border border-kurio-surface bg-kurio-surface2 px-3 py-2">
+                {/* Textos das carteiras dispostos lado a lado no desktop */}
+                <p className="text-xs tracking-wide text-kurio-sand flex flex-col lg:flex-row lg:gap-1.5">
+                  <span>METAMASK</span>
+                  <span className="hidden lg:inline">•</span>
+                  <span>WALLETCONNECT</span>
+                  <span className="hidden lg:inline">•</span>
+                  <span>COINBASE</span>
+                </p>
+              </div>
             </div>
           </div>
         </section>
+      </div>
 
+      <div className="py-4 bg-kurio-bg">
         <p className="text-center text-xs text-kurio-sand">{t('footer.copyright')}</p>
       </div>
     </footer>

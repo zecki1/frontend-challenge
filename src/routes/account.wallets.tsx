@@ -18,6 +18,7 @@ import {
   accountInputClass,
   accountSelectClass,
 } from "@/components/account/account-field";
+import { useMswReady } from '@/lib/msw-ready'
 
 const NETWORK_IDS = ["ethereum", "polygon", "base"] as const;
 
@@ -66,17 +67,20 @@ export const Route = createFileRoute("/account/wallets")({
 function WalletsPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const mswReady = useMswReady();
   const [sameAsMain, setSameAsMain] = useState(false);
   const [secondaryError, setSecondaryError] = useState<string | null>(null);
 
   const { data: wallets, isLoading } = useQuery({
     queryKey: queryKeys.wallets,
     queryFn: ({ signal }) => walletsApi.list(signal),
+    enabled: mswReady,
   });
 
   const { data: networks } = useQuery({
     queryKey: queryKeys.networks,
     queryFn: ({ signal }) => walletsApi.networks(signal),
+    enabled: mswReady,
   });
 
   const primary = wallets?.[0];

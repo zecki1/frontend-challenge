@@ -46,3 +46,4 @@ blob-report
 *.njsproj
 *.sln
 *.sw?
+src/routeTree.gen.ts

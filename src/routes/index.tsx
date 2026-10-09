@@ -11,6 +11,7 @@ import {
 } from '@/components/catalog/catalog'
 import { MobileSearchBar } from '@/components/layout/mobile-search-bar'
 import { MobileTabBar } from '@/components/layout/mobile-tab-bar'
+import { useMswReady } from '@/lib/msw-ready'
 
 export const Route = createFileRoute('/')({
   validateSearch: (search): CatalogSearch => {
@@ -23,6 +24,7 @@ export const Route = createFileRoute('/')({
 function HomePage() {
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
+  const mswReady = useMswReady()
 
   const page = search.page ?? 1
   const tab = search.tab ?? 'all'
@@ -44,6 +46,7 @@ function HomePage() {
     queryKey: queryKeys.nfts.list(params),
     queryFn: ({ signal }) => nftsApi.list(params, signal),
     placeholderData: (previous) => previous,
+    enabled: mswReady,
   })
 
   const updateSearch = (patch: Partial<CatalogSearch>) => {
@@ -136,15 +139,16 @@ function HeroSection({ onSearch }: { onSearch?: (query: string) => void }) {
             </div>
             <div className="relative mt-[5px] h-[146px] w-[138px] shrink-0">
               <img
-                src="/nfts/nft-artwork-03-640.webp"
+                src="/nfts/nft-artwork-03-276.webp"
                 alt=""
                 aria-hidden
                 width={138}
                 height={138}
+                fetchPriority="high"
                 className="h-[138px] w-[138px] rounded-2xl object-cover"
               />
               <img
-                src="/nfts/nft-artwork-04-640.webp"
+                src="/nfts/nft-artwork-04-276.webp"
                 alt=""
                 aria-hidden
                 width={58}
@@ -170,7 +174,7 @@ function HeroSection({ onSearch }: { onSearch?: (query: string) => void }) {
             <p className="mt-1 max-w-[557px] text-sm leading-relaxed text-kurio-sand">{t('home.heroSubtitle')}</p>
             <a
               href="#catalogo"
-              className="mt-8 inline-flex h-10 w-[140px] items-center justify-center rounded-md bg-kurio-copper text-base font-bold tracking-wide text-kurio-bg transition-colors hover:bg-kurio-copperLight"
+              className="mt-8 inline-flex h-10 w-35 items-center justify-center rounded-md bg-kurio-copper text-base font-bold tracking-wide text-kurio-bg transition-colors hover:bg-kurio-copperLight px-4"
             >
               {t('home.explore')}
             </a>
@@ -186,8 +190,6 @@ function HeroSection({ onSearch }: { onSearch?: (query: string) => void }) {
             className="h-[450px] w-full rounded-3xl object-cover"
             width={450}
             height={450}
-            /* Escondida abaixo de 768px: sem `loading`, o navegador baixava os
-               84KB dela em mobile onde ela nunca aparece. */
             loading="lazy"
           />
         </div>
@@ -211,13 +213,15 @@ function PromosSection() {
           <article
             key={index}
             data-aos="fade-up"
-            className="flex h-[250px] overflow-hidden rounded-xl bg-kurio-surface"
+            className="flex min-h-[250px] overflow-hidden rounded-xl bg-kurio-surface"
           >
             <img src={promo.image} alt="" aria-hidden width={640} height={500} className="w-1/2 object-cover" loading="lazy" />
-            <div className="flex flex-1 flex-col items-end justify-end px-6 text-right">
-              <p className="whitespace-pre-line text-lg font-bold leading-6 text-kurio-cream">{promo.title}</p>
-              <p className="mt-2 text-sm leading-[1.6] text-kurio-sand">{promo.text}</p>
-              <span className="mt-6 inline-flex h-10 w-[140px] items-end justify-end gap-1 rounded-md bg-kurio-copper text-sm font-medium text-kurio-bg">
+            <div className="flex flex-1 flex-col items-end justify-between px-6 py-6 text-right">
+              <div>
+                <p className="whitespace-pre-line text-lg font-bold leading-6 text-kurio-cream">{promo.title}</p>
+                <p className="mt-2 text-sm leading-[1.6] text-kurio-sand">{promo.text}</p>
+              </div>
+              <span className="mt-6 inline-flex h-10 w-35 shrink-0 items-center justify-center gap-1 rounded-md bg-kurio-copper text-sm font-medium text-kurio-bg px-4">
                 {t('home.promos.exploreButton')}
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
                   <path d="M5 12h14M13 5l7 7-7 7" />

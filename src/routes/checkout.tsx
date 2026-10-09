@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -9,6 +9,7 @@ import { addEth, formatEth, mulEth } from '@/lib/decimal'
 import { RequireAuth } from '@/components/auth/require-auth'
 import { requireAuthBeforeLoad } from '@/features/auth/require-auth'
 import { useAuth } from '@/features/auth/auth-context'
+import { useMswReady } from '@/lib/msw-ready'
 
 export const Route = createFileRoute('/checkout')({
   beforeLoad: requireAuthBeforeLoad,
@@ -52,29 +53,34 @@ function CheckoutPage() {
   const [useOtherWallet, setUseOtherWallet] = useState(false)
   const [network, setNetwork] = useState('')
   const [walletType, setWalletType] = useState('')
-  const [displayName, setDisplayName] = useState('')
-  const [email, setEmail] = useState('')
+  const [displayName, setDisplayName] = useState(session?.user.name || '')
+  const [email, setEmail] = useState(session?.user.email || '')
   const [username, setUsername] = useState('')
-  const [profileName, setProfileName] = useState('')
+  const [profileName, setProfileName] = useState(session?.user.name || '')
   const [walletAddress, setWalletAddress] = useState('')
   const [ensSecondary, setEnsSecondary] = useState('')
   const [referral, setReferral] = useState('')
   const [ensDomain, setEnsDomain] = useState('.eth')
   const [note, setNote] = useState('')
 
+  const mswReady = useMswReady()
+
   const { data: cart } = useQuery({
     queryKey: queryKeys.cart,
     queryFn: ({ signal }) => cartApi.get(signal),
+    enabled: mswReady,
   })
 
   const { data: wallets } = useQuery({
     queryKey: queryKeys.wallets,
     queryFn: ({ signal }) => walletsApi.list(signal),
+    enabled: mswReady,
   })
 
   const { data: networks } = useQuery({
     queryKey: queryKeys.networks,
     queryFn: ({ signal }) => walletsApi.networks(signal),
+    enabled: mswReady,
   })
 
   const items = cart?.items ?? []
@@ -85,6 +91,22 @@ function CheckoutPage() {
   const total = addEth(subtotal, networkFee)
 
   const selectedWallet = wallets?.find((entry) => entry.id === walletId) ?? wallets?.[0]
+
+  // Atualiza walletAddress e network quando walletId muda
+  useEffect(() => {
+    if (selectedWallet) {
+      setWalletAddress(selectedWallet.address)
+      setWalletType(selectedWallet.id)
+      setNetwork(selectedWallet.networkId)
+    }
+  }, [selectedWallet])
+
+  // Inicializa walletId com a primeira carteira disponível
+  useEffect(() => {
+    if (!walletId && wallets?.length) {
+      setWalletId(wallets[0].id)
+    }
+  }, [wallets, walletId])
 
   const createOrder = useMutation({
     mutationFn: () => {

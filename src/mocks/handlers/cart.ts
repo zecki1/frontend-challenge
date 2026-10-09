@@ -8,6 +8,7 @@ import {
   getOrCreateCart,
   GUEST_CART_ID,
   persistDb,
+  recordActivity,
   uid,
 } from '../db'
 import { findEdition, findNft } from '../quote'
@@ -95,6 +96,8 @@ export const cartHandlers = [
       cart.items.push(item)
     }
     touch(cart)
+    const owner = resolveOwner(request)
+    if (owner !== GUEST_CART_ID) recordActivity(owner, nft.id, 'cart')
     return jsonOk(cart, 201)
   }),
 

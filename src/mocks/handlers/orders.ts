@@ -2,7 +2,7 @@ import { HttpResponse, http } from 'msw'
 import type { CreateOrderPayload, Order, OrderItemSnapshot } from '@/api/types'
 import { env } from '@/lib/env'
 import { scenario } from '../config'
-import { getDb, getOrCreateCart, persistDb, uid, walletsFor } from '../db'
+import { getDb, getOrCreateCart, persistDb, recordActivity, uid, walletsFor } from '../db'
 import { explorerUrl } from '../fixtures/networks'
 import { buildQuote } from '../quote'
 import { broadcastNftUpdated, broadcastOrderUpdated } from '../socket'
@@ -76,6 +76,10 @@ function settleOrder(orderId: string, outcome: 'confirm' | 'reject'): void {
       cart.couponCode = null
       cart.version += 1
       cart.updatedAt = now
+    }
+    // Atividade: registra a compra dos NFTs deste pedido
+    if (ownerId) {
+      for (const item of order.items) recordActivity(ownerId, item.nftId, 'buy')
     }
   } else {
     order.status = 'rejected'

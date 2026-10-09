@@ -12,6 +12,8 @@ export const queryKeys = {
   wallets: ['wallets'] as const,
   networks: ['networks'] as const,
   favorites: ['favorites'] as const,
+  activity: ['activity'] as const,
+  support: ['support'] as const,
   nfts: {
     all: ['nfts'] as const,
     list: (params: NftListParams) => ['nfts', 'list', params] as const,

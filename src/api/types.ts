@@ -388,3 +388,59 @@ export interface ClientToServerEvents {
   subscribe: (payload: { topics: string[] }) => void
   unsubscribe: (payload: { topics: string[] }) => void
 }
+
+/* ------------------------------------------------------------------ *
+ * Atividade do colecionador
+ * ------------------------------------------------------------------ */
+
+export type ActivityAction = 'view' | 'favorite' | 'cart' | 'buy'
+
+export interface ActivityEvent {
+  id: string
+  nftId: string
+  action: ActivityAction
+  at: string
+}
+
+/** Evento de atividade junto com o NFT correspondente (p/ listas). */
+export interface ActivityItem {
+  event: ActivityEvent
+  nft: Nft
+}
+
+/* ------------------------------------------------------------------ *
+ * Suporte — Ordem de Serviço (widget + Resend)
+ * ------------------------------------------------------------------ */
+
+export type SupportCategory =
+  | 'bug'
+  | 'pedido'
+  | 'conta'
+  | 'nft'
+  | 'sugestao'
+  | 'outro'
+
+export type SupportUrgency = 'baixa' | 'media' | 'alta' | 'critica'
+
+export type SupportLevel = 'P1' | 'P2' | 'P3' | 'P4'
+
+export interface SupportTicketPayload {
+  description: string
+  category: SupportCategory
+  urgency: SupportUrgency
+  /** Captura de tela em data URL (base64) para anexo no e-mail. */
+  screenshot?: string | null
+}
+
+export interface SupportTicket {
+  osNumber: string
+  status: 'aberta' | 'em_andamento' | 'resolvida'
+  level: SupportLevel
+  category: SupportCategory
+  urgency: SupportUrgency
+  /** O que o usuário pediu (descrição do problema). */
+  description: string
+  estimatedResponseHrs: number
+  channel: 'resend'
+  createdAt: string
+}
