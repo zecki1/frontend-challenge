@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import './lib/theme-init'
 import './index.css'
 import './i18n'
 import { enableMocking } from './mocks'
