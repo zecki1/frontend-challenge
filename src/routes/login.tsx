@@ -8,7 +8,7 @@ export const Route = createFileRoute('/login')({
 function LoginPage() {
   return (
     <section className="mx-auto flex w-full max-w-md flex-col items-center px-4 py-16">
-      <LoginDialog />
+      <LoginDialog defaultOpen />
     </section>
   )
 }

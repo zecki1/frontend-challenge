@@ -35,13 +35,8 @@ interface NftDetailPageProps {
 }
 
 export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
-  if (!rawNftId) {
-    console.error('❌ nftId é obrigatório mas não foi fornecido!')
-    return <div className="p-8 text-center text-kurio-coral">Erro: nftId não fornecido</div>
-  }
-
   // Normaliza o id da URL ("008" → "nft-008") para bater com os ids dos mocks
-  const nftId = rawNftId.startsWith('nft-') ? rawNftId : `nft-${rawNftId}`
+  const nftId = rawNftId?.startsWith('nft-') ? rawNftId : `nft-${rawNftId ?? ''}`
 
   const { t } = useTranslation()
   const queryClient = useQueryClient()
@@ -62,13 +57,13 @@ export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
     queryKey: queryKeys.nfts.detail(nftId),
     queryFn: ({ signal }) => nftsApi.detail(nftId, signal),
     retry: false,
-    enabled: mswReady,
+    enabled: mswReady && Boolean(rawNftId),
   })
 
   const { data: favorites } = useQuery({
     queryKey: queryKeys.favorites,
     queryFn: ({ signal }) => favoritesApi.list(signal),
-    enabled: mswReady && isAuthenticated,
+    enabled: mswReady && isAuthenticated && Boolean(rawNftId),
   })
 
   const isFavorite = isAuthenticated && (favorites?.nftIds.includes(nftId) ?? false)
@@ -123,6 +118,10 @@ export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
     const el = galleryRef.current
     if (!el || el.clientWidth === 0) return
     setMobileSlide(Math.round(el.scrollLeft / el.clientWidth))
+  }
+
+  if (!rawNftId) {
+    return <div className="p-8 text-center text-kurio-coral">Erro: nftId não fornecido</div>
   }
 
   if (isLoading) {
@@ -462,6 +461,7 @@ export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
                   </button>
                   <button
                     type="button"
+                    aria-label={`${t('nft.favorite')} ${nft.name}`}
                     aria-pressed={isFavorite}
                     onClick={onToggleFavorite}
                     className="flex h-10 w-[130px] items-center justify-center gap-2 rounded-md border border-kurio-copper text-sm font-medium text-kurio-copper transition-colors hover:bg-kurio-copper/10"
@@ -605,7 +605,8 @@ function RelatedNfts({ currentId }: { currentId: string }) {
     enabled: mswReady,
   })
 
-  const items = (data?.items ?? []).filter((nft) => nft.id !== currentId).slice(0, 5)
+  const rawItems = Array.isArray(data?.items) ? data!.items : []
+  const items = rawItems.filter((nft) => nft.id !== currentId).slice(0, 5)
 
   if (!items.length) return null
 

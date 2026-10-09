@@ -32,7 +32,7 @@ export function MobileTabBar() {
       <button
         type="button"
         aria-label={t('nav.scanQr')}
-        className="absolute left-1/2 top-0 flex h-[65px] w-[65px] -translate-x-1/2 items-center justify-center rounded-full bg-gradient-to-b from-kurio-copper/25 to-kurio-copper text-kurio-bg shadow-lg shadow-kurio-bg/40"
+        className="absolute left-1/2 top-0 flex h-[65px] w-[65px] -translate-x-1/2 items-center justify-center rounded-full bg-gradient-to-b from-kurio-copper to-kurio-copper text-kurio-bg shadow-lg shadow-kurio-bg/40"
       >
         <RiQrScan2Line className="h-7 w-7" aria-hidden />
       </button>

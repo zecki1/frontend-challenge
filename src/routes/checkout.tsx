@@ -51,13 +51,10 @@ function CheckoutPage() {
   const [walletId, setWalletId] = useState('')
   const [provider, setProvider] = useState<WalletProvider>('coinbase')
   const [useOtherWallet, setUseOtherWallet] = useState(false)
-  const [network, setNetwork] = useState('')
-  const [walletType, setWalletType] = useState('')
   const [displayName, setDisplayName] = useState(session?.user.name || '')
   const [email, setEmail] = useState(session?.user.email || '')
   const [username, setUsername] = useState('')
   const [profileName, setProfileName] = useState(session?.user.name || '')
-  const [walletAddress, setWalletAddress] = useState('')
   const [ensSecondary, setEnsSecondary] = useState('')
   const [referral, setReferral] = useState('')
   const [ensDomain, setEnsDomain] = useState('.eth')
@@ -83,30 +80,25 @@ function CheckoutPage() {
     enabled: mswReady,
   })
 
-  const items = cart?.items ?? []
-  const subtotal = items.length
-    ? addEth(...items.map((item) => mulEth(item.unitPriceEth, item.quantity)))
+  const items = Array.isArray(cart?.items) ? cart!.items : []
+  const subtotal = items.length > 0
+    ? addEth(...items.map((item) => mulEth(item.unitPriceEth ?? '0', item.quantity ?? 1)))
     : '0'
   const networkFee = '0.016'
   const total = addEth(subtotal, networkFee)
 
   const selectedWallet = wallets?.find((entry) => entry.id === walletId) ?? wallets?.[0]
-
-  // Atualiza walletAddress e network quando walletId muda
-  useEffect(() => {
-    if (selectedWallet) {
-      setWalletAddress(selectedWallet.address)
-      setWalletType(selectedWallet.id)
-      setNetwork(selectedWallet.networkId)
-    }
-  }, [selectedWallet])
+  const walletAddress = selectedWallet?.address ?? ''
+  const network = selectedWallet?.networkId ?? ''
 
   // Inicializa walletId com a primeira carteira disponível
   useEffect(() => {
     if (!walletId && wallets?.length) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- init on mount only
       setWalletId(wallets[0].id)
     }
-  }, [wallets, walletId])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- init on mount only
+  }, [wallets])
 
   const createOrder = useMutation({
     mutationFn: () => {
@@ -324,8 +316,8 @@ function CheckoutPage() {
                       <select
                         id="co-network"
                         value={network}
-                        onChange={(event) => setNetwork(event.target.value)}
-                        className={`${inputClass} appearance-none pr-10 placeholder:text-kurio-bronze`}
+                        disabled
+                        className={`${inputClass} appearance-none pr-10 placeholder:text-kurio-bronze opacity-50`}
                       >
                         <option value="">{t('checkout.selectNetwork')}</option>
                         {(networks ?? []).map((entry) => (
@@ -344,22 +336,18 @@ function CheckoutPage() {
                     <input
                       id="co-address"
                       type="text"
-                      value={walletAddress || selectedWallet?.address || ''}
-                      onChange={(event) => setWalletAddress(event.target.value)}
+                      value={walletAddress}
+                      readOnly
                       placeholder={t('checkout.walletAddressPlaceholder')}
-                      className={inputClass}
+                      className={`${inputClass} opacity-50`}
                     />
                   </Field>
                   <Field label={t('checkout.walletType')} id="co-wallet-type">
                     <div className="relative">
                       <select
                         id="co-wallet-type"
-                        value={walletType || selectedWallet?.id || ''}
-                        onChange={(event) => {
-                          setWalletType(event.target.value)
-                          setWalletId(event.target.value)
-                          setWalletAddress('')
-                        }}
+                        value={walletId}
+                        onChange={(event) => setWalletId(event.target.value)}
                         className={`${inputClass} appearance-none pr-10`}
                       >
                         <option value="">{t('checkout.selectWallet')}</option>

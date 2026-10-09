@@ -145,7 +145,7 @@ function OrderConfirmationPage() {
           </div>
 
           <ul className="mt-3 space-y-3">
-            {order.items.map((item) => (
+            {(Array.isArray(order?.items) ? order.items : []).map((item) => (
               <li
                 key={`${item.nftId}-${item.editionId}`}
                 className="grid h-[70px] grid-cols-[1fr_93px_100px] items-center bg-kurio-surface pl-3 pr-3"

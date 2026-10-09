@@ -58,9 +58,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await sessionApi.logout()
     } catch {
-      /* logout local mesmo se a API falhar */
+      /* logout local mesmo se a API falhar - intentional no-op */
     }
     clearSession()
+    if (typeof window !== 'undefined') {
+      try { window.dispatchEvent(new Event('kurio:auth-logout')) } catch { /* no-op */ }
+    }
   }, [clearSession])
 
   useEffect(() => {
