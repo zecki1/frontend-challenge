@@ -1,7 +1,6 @@
 import { Link, useMatchRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { Heart, House, ShoppingCart, User } from 'lucide-react'
-import { RiQrScan2Line } from 'react-icons/ri'
+import { RiHeartLine, RiHome5Line, RiQrScan2Line, RiShoppingCartLine, RiUserLine } from 'react-icons/ri'
 
 /**
  * Tab Bar Mobile — 4 itens: Início, Favoritos, Carrinho, Perfil
@@ -20,14 +19,20 @@ export function MobileTabBar() {
       aria-label={t('nav.mobileTabs')}
       className="fixed inset-x-0 bottom-0 z-40 h-[126px] md:hidden"
     >
-      {/* Retângulo base da barra (95px altura) */}
-      <div className="absolute inset-x-0 bottom-0 h-[95px] border-t border-kurio-surface2 bg-kurio-surface" />
+      {/*
+        Retângulo base da barra (95px). Tem um recorte vazado (mask) no topo-central,
+        exatamente onde o círculo do QR Scanner atravessa a barra — o círculo não
+        "encosta" no retângulo, como no Figma/CodePen.
+      */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-[95px] border-t border-kurio-surface2 bg-kurio-surface [-webkit-mask-image:radial-gradient(circle_at_50%_2px,transparent_36px,black_37px)] [mask-image:radial-gradient(circle_at_50%_2px,transparent_36px,black_37px)] rounded-t-3xl"
+      />
 
-      {/* Botão central flutuante — QR Code Scanner (65x65, sobressai 31px) */}
+      {/* Botão central flutuante — QR Code Scanner (65x65, alinhado à borda superior do frame; corte de 34px na base, como no Figma) */}
       <button
         type="button"
         aria-label={t('nav.scanQr')}
-        className="absolute left-1/2 top-[-31px] flex h-[65px] w-[65px] -translate-x-1/2 items-center justify-center rounded-full bg-gradient-to-b from-kurio-copper/25 to-kurio-copper text-kurio-bg shadow-lg shadow-kurio-bg/40"
+        className="absolute left-1/2 top-0 flex h-[65px] w-[65px] -translate-x-1/2 items-center justify-center rounded-full bg-gradient-to-b from-kurio-copper/25 to-kurio-copper text-kurio-bg shadow-lg shadow-kurio-bg/40"
       >
         <RiQrScan2Line className="h-7 w-7" aria-hidden />
       </button>
@@ -40,7 +45,7 @@ export function MobileTabBar() {
             aria-label={t('nav.inicio')}
             className={itemClass(Boolean(matchRoute({ to: '/', fuzzy: false })))}
           >
-            <House className="h-5 w-5" aria-hidden />
+            <RiHome5Line className="h-5 w-5" aria-hidden />
           </Link>
         </li>
         <li>
@@ -49,7 +54,7 @@ export function MobileTabBar() {
             aria-label={t('nav.favorites')}
             className={itemClass(Boolean(matchRoute({ to: '/favorites' })))}
           >
-            <Heart className="h-5 w-5" aria-hidden />
+            <RiHeartLine className="h-5 w-5" aria-hidden />
           </Link>
         </li>
         {/* Espaço para o botão central flutuante */}
@@ -60,7 +65,7 @@ export function MobileTabBar() {
             aria-label={t('nav.carrinho')}
             className={itemClass(Boolean(matchRoute({ to: '/cart' })))}
           >
-            <ShoppingCart className="h-5 w-5" aria-hidden />
+            <RiShoppingCartLine className="h-5 w-5" aria-hidden />
           </Link>
         </li>
         <li>
@@ -71,7 +76,7 @@ export function MobileTabBar() {
               Boolean(matchRoute({ to: '/account/profile' })) || Boolean(matchRoute({ to: '/account/wallets' })),
             )}
           >
-            <User className="h-5 w-5" aria-hidden />
+            <RiUserLine className="h-5 w-5" aria-hidden />
           </Link>
         </li>
       </ul>
