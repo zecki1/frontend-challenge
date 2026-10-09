@@ -164,14 +164,14 @@ export function CatalogSection(props: CatalogProps) {
                 className="mt-10 flex h-[35px] items-center justify-end gap-2"
               />
             </>
-          ) : props.data && props.data.items.length === 0 ? (
+          ) : props.data && Array.isArray(props.data.items) && props.data.items.length === 0 ? (
             <p className="rounded-lg border border-dashed border-kurio-surface p-8 text-center text-sm text-kurio-sand">
               {t('common.empty')}
             </p>
           ) : props.data ? (
             <>
               <ul className="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-3 md:gap-x-[34px] md:gap-y-[72px] max-md:[&>*:nth-child(even)]:mt-8">
-                {props.data.items.map((nft, nftIndex) => (
+                {(Array.isArray(props.data?.items) ? props.data.items : []).map((nft, nftIndex) => (
                   <NftCard
                     key={nft.id}
                     nft={nft}

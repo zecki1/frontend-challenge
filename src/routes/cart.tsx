@@ -41,9 +41,9 @@ function CartPage() {
     onSuccess: (data) => queryClient.setQueryData(queryKeys.cart, data),
   })
 
-  const items = cart?.items ?? []
-  const subtotal = items.length
-    ? addEth(...items.map((item) => mulEth(item.unitPriceEth, item.quantity)))
+  const items = Array.isArray(cart?.items) ? cart!.items : []
+  const subtotal = items.length > 0
+    ? addEth(...items.map((item) => mulEth(item.unitPriceEth ?? '0', item.quantity ?? 1)))
     : '0'
   const networkFee = '0.016'
   const total = addEth(subtotal, networkFee)

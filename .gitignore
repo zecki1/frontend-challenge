@@ -6,7 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
+routeTree.gen.ts*
 
 design/
 
@@ -46,4 +46,5 @@ blob-report
 *.njsproj
 *.sln
 *.sw?
-src/routeTree.gen.ts
+.vercel
+.env*

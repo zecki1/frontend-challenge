@@ -24,7 +24,8 @@ export function KurioHeader() {
     queryFn: ({ signal }) => cartApi.get(signal),
     enabled: mswReady,
   })
-  const cartCount = cartQuery.data?.items.reduce((total, item) => total + item.quantity, 0) ?? 0
+  const itemsCart = cartQuery.data?.items ?? []
+  const cartCount = itemsCart.reduce((total, item) => total + (item?.quantity ?? 0), 0)
 
   const itemBase =
     'flex h-[46px] items-center font-mono text-base transition-colors border-b-[3px]'
