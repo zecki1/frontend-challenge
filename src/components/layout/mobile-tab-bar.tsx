@@ -17,7 +17,7 @@ export function MobileTabBar() {
   return (
     <nav
       aria-label={t('nav.mobileTabs')}
-      className="fixed inset-x-0 bottom-0 z-40 h-[126px] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 h-[95px] md:hidden"
     >
       {/*
         Retângulo base da barra (95px). Tem um recorte vazado (mask) no topo-central,
@@ -25,20 +25,20 @@ export function MobileTabBar() {
         "encosta" no retângulo, como no Figma/CodePen.
       */}
       <div
-        className="absolute inset-x-0 bottom-0 h-[95px] border-t border-kurio-surface2 bg-kurio-surface [-webkit-mask-image:radial-gradient(circle_at_50%_2px,transparent_36px,black_37px)] [mask-image:radial-gradient(circle_at_50%_2px,transparent_36px,black_37px)] rounded-t-3xl"
+        className="absolute inset-x-0 bottom-0 h-full border-t border-kurio-surface2 bg-kurio-surface [-webkit-mask-image:radial-gradient(circle_at_50%_0,transparent_36px,black_37px)] [mask-image:radial-gradient(circle_at_50%_0,transparent_36px,black_37px)] rounded-t-3xl"
       />
 
       {/* Botão central flutuante — QR Code Scanner (65x65, alinhado à borda superior do frame; corte de 34px na base, como no Figma) */}
       <button
         type="button"
         aria-label={t('nav.scanQr')}
-        className="absolute left-1/2 top-0 flex h-[65px] w-[65px] -translate-x-1/2 items-center justify-center rounded-full bg-gradient-to-b from-kurio-copper to-kurio-copper text-kurio-bg shadow-lg shadow-kurio-bg/40"
+        className="absolute left-1/2 top-[-18px] flex h-[65px] w-[65px] -translate-x-1/2 items-center justify-center rounded-full bg-gradient-to-b from-kurio-copper to-kurio-copper text-kurio-bg shadow-lg shadow-kurio-bg/40"
       >
         <RiQrScan2Line className="h-7 w-7" aria-hidden />
       </button>
 
       {/* Itens da tab bar: Início, Favoritos, Carrinho, Perfil */}
-      <ul className="relative flex h-full items-end justify-between px-9 pb-[35px]">
+      <ul className="relative flex h-full items-center justify-between px-9">
         <li>
           <Link
             to="/"
