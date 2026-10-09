@@ -70,7 +70,7 @@ function settleOrder(orderId: string, outcome: 'confirm' | 'reject'): void {
         if (!entry) continue
         entry.quantity -= item.quantity
         if (entry.quantity <= 0) {
-          cart.items = cart.items.filter((line) => line.id !== entry.id)
+          if (Array.isArray(cart.items)) cart.items = cart.items.filter((line) => line.id !== entry.id)
         }
       }
       cart.couponCode = null

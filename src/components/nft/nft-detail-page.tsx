@@ -35,13 +35,8 @@ interface NftDetailPageProps {
 }
 
 export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
-  if (!rawNftId) {
-    console.error('❌ nftId é obrigatório mas não foi fornecido!')
-    return <div className="p-8 text-center text-kurio-coral">Erro: nftId não fornecido</div>
-  }
-
   // Normaliza o id da URL ("008" → "nft-008") para bater com os ids dos mocks
-  const nftId = rawNftId.startsWith('nft-') ? rawNftId : `nft-${rawNftId}`
+  const nftId = rawNftId?.startsWith('nft-') ? rawNftId : `nft-${rawNftId ?? ''}`
 
   const { t } = useTranslation()
   const queryClient = useQueryClient()
@@ -57,6 +52,10 @@ export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
   const [isZoomed, setIsZoomed] = useState(false)
 
   const mswReady = useMswReady()
+
+  if (!rawNftId) {
+    return <div className="p-8 text-center text-kurio-coral">Erro: nftId não fornecido</div>
+  }
 
   const { data: nft, isLoading, isError, error } = useQuery({
     queryKey: queryKeys.nfts.detail(nftId),
@@ -605,7 +604,8 @@ function RelatedNfts({ currentId }: { currentId: string }) {
     enabled: mswReady,
   })
 
-  const items = (data?.items ?? []).filter((nft) => nft.id !== currentId).slice(0, 5)
+  const rawItems = Array.isArray(data?.items) ? data!.items : []
+  const items = rawItems.filter((nft) => nft.id !== currentId).slice(0, 5)
 
   if (!items.length) return null
 

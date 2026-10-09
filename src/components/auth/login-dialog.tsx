@@ -18,11 +18,12 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
-export function LoginDialog() {
+export function LoginDialog({ defaultOpen = false }: { defaultOpen?: boolean }) {
   const { t } = useTranslation()
   const { login } = useAuth()
   const navigate = useNavigate()
   const [registerOpen, setRegisterOpen] = useState(false)
+  const [open, setOpen] = useState(defaultOpen)
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -41,7 +42,7 @@ export function LoginDialog() {
   })
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button
           type="button"

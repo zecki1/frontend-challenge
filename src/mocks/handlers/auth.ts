@@ -22,7 +22,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 function mergeGuestCart(userId: string): void {
   const db = getDb()
   const guest = db.carts[GUEST_CART_ID]
-  if (!guest || guest.items.length === 0) {
+  if (!guest || !Array.isArray(guest.items) || guest.items.length === 0) {
     delete db.carts[GUEST_CART_ID]
     return
   }
