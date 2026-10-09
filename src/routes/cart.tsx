@@ -2,11 +2,12 @@ import { useRef } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Minus, Plus, Trash2 } from 'lucide-react'
-import { cartApi, nftsApi, queryKeys } from '@/api'
+import { ArrowLeft, Minus, Plus, Trash2, TriangleAlert } from 'lucide-react'
+import { cartApi, nftsApi, queryKeys, quoteApi } from '@/api'
 import { addEth, formatEth, mulEth } from '@/lib/decimal'
-import type { CartItem } from '@/api/types'
+import type { CartItem, Quote, QuoteChange } from '@/api/types'
 import { useMswReady } from '@/lib/msw-ready'
+import { useAuth } from '@/features/auth/auth-context'
 
 export const Route = createFileRoute('/cart')({
   component: CartPage,
@@ -16,6 +17,7 @@ function CartPage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const mswReady = useMswReady()
+  const { isAuthenticated } = useAuth()
   const couponDesktopRef = useRef<HTMLInputElement>(null)
   const couponMobileRef = useRef<HTMLInputElement>(null)
 
@@ -23,6 +25,15 @@ function CartPage() {
     queryKey: queryKeys.cart,
     queryFn: ({ signal }) => cartApi.get(signal),
     enabled: mswReady,
+  })
+
+  const { data: quote } = useQuery({
+    queryKey: queryKeys.quote.detail({
+      couponCode: cart?.couponCode ?? null,
+      version: cart?.version,
+    }),
+    queryFn: ({ signal }) => quoteApi.get(signal),
+    enabled: mswReady && isAuthenticated,
   })
 
   const updateItem = useMutation({
@@ -164,6 +175,13 @@ function CartPage() {
             <h1 className="text-xl font-bold text-kurio-cream">{t('cart.heading')}</h1>
           </div>
 
+          <CartChangesAlert
+            changes={quote?.changes ?? []}
+            items={items}
+            lines={quote?.lines ?? []}
+            couponCode={cart?.couponCode ?? null}
+          />
+
           <ul className="mt-3 space-y-5">
             {items.map((item) => (
               <li
@@ -290,6 +308,13 @@ function CartPage() {
             <span>{t('cart.title')}</span>
           </nav>
 
+          <CartChangesAlert
+            changes={quote?.changes ?? []}
+            items={items}
+            lines={quote?.lines ?? []}
+            couponCode={cart?.couponCode ?? null}
+          />
+
           <div className="mt-3 flex flex-col gap-8 xl:flex-row xl:gap-[86px]">
             <div className="min-w-0 flex-1">
               <div className="grid grid-cols-[minmax(180px,1fr)_138px_136px_148px_48px] border-b border-kurio-copper pb-3 text-base text-kurio-cream">
@@ -385,6 +410,73 @@ function CartPage() {
         </div>
       </div>
     </>
+  )
+}
+
+function CartChangesAlert({
+  changes,
+  items,
+  lines,
+  couponCode,
+}: {
+  changes: QuoteChange[]
+  items: CartItem[]
+  lines: Quote['lines']
+  couponCode: string | null
+}) {
+  const { t } = useTranslation()
+  if (changes.length === 0) return null
+
+  const describe = (change: QuoteChange): string => {
+    const item = change.cartItemId
+      ? items.find((entry) => entry.id === change.cartItemId)
+      : undefined
+    const name = item?.name ?? t('cart.changes.item')
+
+    if (change.reason === 'coupon_invalid' || change.reason === 'coupon_expired') {
+      const key =
+        change.reason === 'coupon_invalid'
+          ? 'cart.changes.couponInvalid'
+          : 'cart.changes.couponExpired'
+      return t(key, { code: couponCode ?? '' })
+    }
+
+    if (change.reason === 'price_changed') {
+      const line = lines.find((entry) => entry.cartItemId === change.cartItemId)
+      if (item && line) {
+        return t('cart.changes.priceChanged', {
+          name,
+          from: `${formatEth(item.unitPriceEth)} ETH`,
+          to: `${formatEth(line.unitPriceEth)} ETH`,
+        })
+      }
+      return t('cart.changes.priceChangedGeneric', { name })
+    }
+
+    const key =
+      change.reason === 'edition_unavailable'
+        ? 'cart.changes.editionUnavailable'
+        : 'cart.changes.outOfStock'
+    return t(key, { name })
+  }
+
+  return (
+    <div
+      role="status"
+      className="mt-4 flex items-start gap-3 rounded-lg border border-kurio-copper/50 bg-kurio-copper/10 p-4"
+    >
+      <TriangleAlert className="mt-0.5 size-5 shrink-0 text-kurio-copper" aria-hidden />
+      <div className="min-w-0">
+        <p className="text-[15px] font-bold text-kurio-cream">{t('cart.changes.title')}</p>
+        <ul className="mt-1 list-disc space-y-1 pl-4 text-sm leading-5 text-kurio-sand">
+          {changes.map((change, index) => (
+            <li key={`${change.reason}-${change.cartItemId ?? 'global'}-${index}`}>
+              {describe(change)}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   )
 }
 

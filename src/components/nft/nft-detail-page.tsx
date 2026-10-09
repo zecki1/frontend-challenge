@@ -66,7 +66,7 @@ export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
     enabled: mswReady && isAuthenticated && Boolean(rawNftId),
   })
 
-  const isFavorite = isAuthenticated && (favorites?.nftIds.includes(nftId) ?? false)
+  const isFavorite = isAuthenticated && (favorites?.nftIds ?? []).includes(nftId)
 
   const addToCart = useMutation({
     mutationFn: (selectedEditionId: string) =>
