@@ -1,5 +1,16 @@
 # NFT Marketplace — Frontend Challenge
 
+![E2E Tests](https://img.shields.io/badge/E2E-20%2F20%20passing-brightgreen)
+![Lighthouse Mobile](https://img.shields.io/badge/Lighthouse_Mobile-P91%2FP90-success)
+![Lighthouse Desktop](https://img.shields.io/badge/Lighthouse_Desktop-P99%2FP95-success)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
+![Lint](https://img.shields.io/badge/ESLint-0%20errors-green)
+
+> **E2E Test Screenshots (CI Artifacts):**
+> - [Desktop Chrome](https://github.com/zecki1/frontend-challenge/actions/runs/37962466359) — 20/20 tests passing
+> - [Mobile Chrome](https://github.com/zecki1/frontend-challenge/actions/runs/37962466359) — 20/20 tests passing
+> - Screenshots/videos available in each run's **Artifacts** → `test-results/`
+
 Implementação do **NFT Marketplace** em React + TypeScript seguindo o [layout no Figma](https://www.figma.com/design/Ff0SksUi7UFtPWUO8kyNtw/Frontend-Challenge?node-id=0-1). O enunciado completo está em [`docs/ENUNCIADO.md`](./docs/ENUNCIADO.md).
 
 ## Stack Obrigatória
