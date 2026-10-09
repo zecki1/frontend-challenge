@@ -461,6 +461,7 @@ export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
                   </button>
                   <button
                     type="button"
+                    aria-label={`${t('nft.favorite')} ${nft.name}`}
                     aria-pressed={isFavorite}
                     onClick={onToggleFavorite}
                     className="flex h-10 w-[130px] items-center justify-center gap-2 rounded-md border border-kurio-copper text-sm font-medium text-kurio-copper transition-colors hover:bg-kurio-copper/10"
