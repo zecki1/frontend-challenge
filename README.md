@@ -11,7 +11,9 @@
 > - [Mobile Chrome](https://github.com/zecki1/frontend-challenge/actions/runs/37962466359) — 20/20 tests passing
 > - Screenshots/videos available in each run's **Artifacts** → `test-results/`
 
-Implementação do **NFT Marketplace** em React + TypeScript seguindo o [layout no Figma](https://www.figma.com/design/Ff0SksUi7UFtPWUO8kyNtw/Frontend-Challenge?node-id=0-1). O enunciado completo está em [`docs/ENUNCIADO.md`](./docs/ENUNCIADO.md).
+Implementação do **NFT Marketplace** em React + TypeScript seguindo o [layout no Figma](https://www.figma.com/design/Ff0SksUi7UFtPWUO8kyNtw/Frontend-Challenge?node-id=0-1). O enunciado completo está em [`docs/ENUNCIADO.md`](./docs/ENUNCIADO.md). A arquitetura e decisões técnicas estão em [`ARCHITECTURE.md`](./ARCHITECTURE.md).
+
+> **Entrega final:** commit [`f0c279a`](https://github.com/zecki1/frontend-challenge/commit/f0c279a) — fidelidade visual, performance (Lighthouse mobile P91/P90, desktop P99/P95, A11y/BP/SEO 100), acessibilidade e quality gates (typecheck/lint/E2E 20/20).
 
 ## Stack Obrigatória
 
