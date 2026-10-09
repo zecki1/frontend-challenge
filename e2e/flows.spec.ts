@@ -27,7 +27,8 @@ async function login(page: import("@playwright/test").Page) {
     .click();
   await expect(page).not.toHaveURL(/\/login/);
   if (test.info().project.name === "chromium-desktop") {
-    await expect(page.getByRole("button", { name: "Menu do usuário" })).toBeVisible();
+    // O menu do usuário é um <Link> com aria-label="Menu do usuário", não um <button>
+    await expect(page.getByRole("link", { name: "Menu do usuário" })).toBeVisible();
   }
 }
 

@@ -55,7 +55,7 @@ test("login autentica e mostra o usuário na navegação", async ({ page }) => {
   await submitLogin(page).click();
   await expect(page).not.toHaveURL(/\/login/);
   if (test.info().project.name === "chromium-desktop") {
-    await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Menu do usuário" })).toBeVisible();
   } else {
     await page.goto("/favorites");
     await expect(page).not.toHaveURL(/\/login/);
