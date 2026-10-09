@@ -41,7 +41,6 @@
 | [`docs/ENUNCIADO.md`](./docs/ENUNCIADO.md) | Enunciado completo do desafio |
 | [`ARCHITECTURE.md`](./ARCHITECTURE.md) | Arquitetura: contratos, cache, tempo real, mocks, limitações |
 | [`docs/DECISOES.md`](./docs/DECISOES.md) | Registro de decisões, performance, acessibilidade, cronograma detalhado |
-| [`docs/RESUMO-ENTREGA.md`](./docs/RESUMO-ENTREGA.md) | Checklist de entrega e validações |
 
 ---
 
@@ -136,9 +135,9 @@ npm run build:demo && npm run preview
 | **E2E & Visual Regression** | 09/10 19:30–20:30 | ~1h | 20/20 testes (desktop+mobile), 8 baselines visuais, CI pipeline |
 | **Documentação & Deploy** | 09/10 20:30–21:30 | ~1h | README, ARCHITECTURE, DECISOES, screenshots mobile, Vercel PRs |
 
-| **Total** | **07/10 15:18 → 09/10 21:30** | **~31h** | **Entrega completa** |
+| **Total** | **07/10 15:18 → 09/10 14:34** | **~31h** | **Entrega completa** |
 
-> **Nota:** Prazo original de 2 dias úteis (07/10–09/10). Trabalho executado em ~31h distribuídas ao longo de 2 dias.
+> **Nota:** Prazo original de 2 dias úteis (07/10–09/10). Trabalho executado em ~31h distribuídas ao longo de 2 dias, com margem para imprevistos (fixes de CI, ajustes de mobile tab bar, crash `includes`).
 
 ---
 
@@ -186,7 +185,7 @@ feature   → feat/<assunto> + PR para develop
 
 ---
 
-## ⚠️ Pendências Conhecidas (Backlog)
+## ⚠️ Próximos Passos (pós-entrega)
 
 - §7 Aviso de preço alterado no carrinho (UI + i18n)
 - 35 chaves i18n não usadas
