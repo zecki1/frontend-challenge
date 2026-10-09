@@ -140,17 +140,15 @@ function HeroSection({ onSearch }: { onSearch?: (query: string) => void }) {
             <div className="relative mt-[5px] h-[146px] w-[138px] shrink-0">
               <img
                 src="/nfts/nft-artwork-03-276.webp"
-                alt=""
-                aria-hidden
+                alt="Arte do NFT Emerald Ape #042"
                 width={138}
                 height={138}
                 fetchPriority="high"
                 className="h-[138px] w-[138px] rounded-2xl object-cover"
               />
               <img
-                src="/nfts/nft-artwork-04-276.webp"
-                alt=""
-                aria-hidden
+                src="/nfts/nft-artwork-04-128.webp"
+                alt="Arte do NFT Sage Nomad #009"
                 width={58}
                 height={58}
                 className="absolute bottom-0 left-3.5 h-[58px] w-[58px] rounded-xl object-cover"
@@ -203,8 +201,8 @@ function HeroSection({ onSearch }: { onSearch?: (query: string) => void }) {
 function PromosSection() {
   const { t } = useTranslation()
   const promos = [
-    { title: t('home.promos.genesisTitle'), text: t('home.promos.genesisText'), image: '/nfts/nft-artwork-03-640.webp' },
-    { title: t('home.promos.curatedTitle'), text: t('home.promos.curatedText'), image: '/nfts/nft-artwork-05-640.webp' },
+    { title: t('home.promos.genesisTitle'), text: t('home.promos.genesisText'), image: '/nfts/nft-artwork-03-640.webp', nftName: 'Emerald Ape #042' },
+    { title: t('home.promos.curatedTitle'), text: t('home.promos.curatedText'), image: '/nfts/nft-artwork-05-640.webp', nftName: 'Neon Vessel #552' },
   ]
   return (
     <section className="mx-auto mt-24 max-w-content px-4 sm:px-6">
@@ -218,8 +216,9 @@ function PromosSection() {
             {/* Primeira imagem não-lazy e com prioridade alta: é o LCP na home mobile */}
             <img
               src={promo.image}
-              alt=""
-              aria-hidden
+              srcSet={`${promo.image.replace('-640', '-384')} 384w, ${promo.image} 640w, ${promo.image.replace('-640', '-1280')} 1280w`}
+              sizes="(max-width: 767px) 44vw, 340px"
+              alt={`Arte do NFT ${promo.nftName}`}
               width={640}
               height={500}
               className="w-1/2 object-cover"
@@ -277,8 +276,7 @@ function BlogSection() {
           >
             <img
               src={images[index % images.length]}
-              alt=""
-              aria-hidden
+              alt={article.title}
               width={640}
               height={195}
               className="h-[195px] w-full object-cover"

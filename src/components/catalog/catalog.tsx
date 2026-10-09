@@ -378,6 +378,7 @@ export function NftCard({
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
   const mswReady = useMswReady()
+  const art384 = nft.imageUrl.replace('-1280', '-384')
   const art640 = nft.imageUrl.replace('-1280', '-640')
   const nftNumber = nft.id.replace('nft-', '')
   const queryClient = useQueryClient()
@@ -448,10 +449,10 @@ export function NftCard({
       <Link to="/mercado/nft/$nftNumber" params={{ nftNumber }} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kurio-copper">
         <div className="relative h-[200px] overflow-hidden rounded-xl bg-gradient-to-b from-kurio-surface to-kurio-surface2 md:h-[300px]">
           <img
-            src={nft.imageUrl}
-            srcSet={`${art640} 640w, ${nft.imageUrl} 1280w`}
-            sizes="(max-width: 768px) 45vw, 258px"
-            alt={`Arte do NFT ${nft.name}`}
+            src={art384}
+            srcSet={`${art384} 384w, ${art640} 640w, ${nft.imageUrl} 1280w`}
+            sizes="(max-width: 767px) 168px, 258px"
+            alt={`NFT ${nftNumber}`}
             width={250}
             height={250}
             loading={eager ? 'eager' : 'lazy'}

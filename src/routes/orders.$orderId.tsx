@@ -152,9 +152,8 @@ function OrderConfirmationPage() {
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <img
-                    src={item.imageUrl.replace('-1280', '-640')}
-                    alt=""
-                    aria-hidden
+                    src={item.imageUrl.replace('-1280', '-256')}
+                    alt={`NFT ${item.nftId.replace('nft-', '')}`}
                     className="size-[70px] shrink-0 rounded-lg object-cover"
                   />
                   <div className="min-w-0">

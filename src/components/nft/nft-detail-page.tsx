@@ -377,7 +377,11 @@ export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
                             : 'opacity-60 hover:opacity-100'
                         }`}
                       >
-                        <img src={image} alt="" aria-hidden className="size-full object-cover" />
+                        <img
+                        src={image.replace('-1280', '-256').replace('-640', '-256')}
+                        alt={`NFT ${nft.id.replace('nft-', '')}`}
+                        className="size-full object-cover"
+                      />
                       </button>
                     </li>
                   ))}
@@ -613,7 +617,9 @@ function RelatedNfts({ currentId }: { currentId: string }) {
             <Link to="/mercado/nft/$nftNumber" params={{ nftNumber: nft.id.replace('nft-', '') }} className="block">
               <div className="h-[255px] overflow-hidden rounded-md bg-kurio-surface">
                 <img
-                  src={nft.imageUrl}
+                  src={nft.imageUrl.replace('-1280', '-384')}
+                  srcSet={`${nft.imageUrl.replace('-1280', '-384')} 384w, ${nft.imageUrl.replace('-1280', '-640')} 640w, ${nft.imageUrl} 1280w`}
+                  sizes="(max-width: 767px) 45vw, 255px"
                   alt={t('nft.mainImageAria', { name: nft.name })}
                   loading="lazy"
                   className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"

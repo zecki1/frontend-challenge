@@ -171,9 +171,8 @@ function CartPage() {
                 className="relative h-[100px] overflow-hidden rounded-[14px] bg-gradient-to-br from-kurio-surface to-kurio-surface2"
               >
                 <img
-                  src={item.imageUrl.replace('-1280', '-640')}
-                  alt=""
-                  aria-hidden
+                  src={item.imageUrl.replace('-1280', '-256')}
+                  alt={`NFT ${item.nftId.replace('nft-', '')}`}
                   className="absolute left-0 top-0 size-[100px] rounded-[14px] object-cover"
                 />
                 <p className="absolute left-[109px] top-[13px] max-w-[145px] truncate text-[15px] font-bold text-kurio-cream">
@@ -309,9 +308,8 @@ function CartPage() {
                   >
                     <div className="flex min-w-0 items-center gap-4">
                       <img
-                        src={item.imageUrl.replace('-1280', '-640')}
-                        alt=""
-                        aria-hidden
+                        src={item.imageUrl.replace('-1280', '-256')}
+                        alt={`NFT ${item.nftId.replace('nft-', '')}`}
                         className="size-[70px] shrink-0 rounded-md object-cover"
                       />
                       <div className="min-w-0">
@@ -436,7 +434,9 @@ function RelatedProducts() {
             <Link to="/mercado/nft/$nftNumber" params={{ nftNumber: nft.id.replace('nft-', '') }} className="block">
               <div className="h-[255px] overflow-hidden rounded-md bg-kurio-surface px-[14.5px] py-1.5">
                 <img
-                  src={nft.imageUrl}
+                  src={nft.imageUrl.replace('-1280', '-384')}
+                  srcSet={`${nft.imageUrl.replace('-1280', '-384')} 384w, ${nft.imageUrl.replace('-1280', '-640')} 640w, ${nft.imageUrl} 1280w`}
+                  sizes="(max-width: 767px) 45vw, 258px"
                   alt={t('nft.mainImageAria', { name: nft.name })}
                   loading="lazy"
                   className="h-full w-full rounded-[15px] object-cover transition-transform duration-300 group-hover:scale-[1.03]"

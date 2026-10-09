@@ -123,16 +123,14 @@ function MarketplaceBanner() {
         </div>
         <img
           src="/nfts/nft-artwork-03-1280.webp"
-          alt=""
-          aria-hidden
+          alt="Arte do NFT Emerald Ape #042"
           className="absolute right-0 top-0 hidden h-full w-[450px] rounded-2xl object-cover md:block"
           width={450}
           height={450}
         />
         <img
           src="/nfts/nft-artwork-03-640.webp"
-          alt=""
-          aria-hidden
+          alt="Arte do NFT Emerald Ape #042"
           className="absolute right-[260px] top-[280px] hidden h-[120px] w-[120px] rounded-2xl object-cover md:block"
           width={120}
           height={120}

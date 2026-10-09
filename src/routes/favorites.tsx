@@ -51,7 +51,9 @@ function FavoritesPage() {
               <Link to="/mercado/nft/$nftNumber" params={{ nftNumber: nft.id.replace('nft-', '') }} className="block">
                 <div className="overflow-hidden rounded-xl border border-kurio-surface bg-kurio-surface/40">
                   <img
-                    src={nft.imageUrl}
+                    src={nft.imageUrl.replace('-1280', '-384')}
+                    srcSet={`${nft.imageUrl.replace('-1280', '-384')} 384w, ${nft.imageUrl.replace('-1280', '-640')} 640w, ${nft.imageUrl} 1280w`}
+                    sizes="(max-width: 767px) 45vw, 258px"
                     alt={`Arte do NFT ${nft.name}`}
                     loading="lazy"
                     className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"

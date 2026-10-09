@@ -492,9 +492,8 @@ function CheckoutPage() {
                   {items.map((item) => (
                     <li key={item.id} className="flex h-[70px] items-center bg-kurio-surface pl-[3px] pr-[15px]">
                       <img
-                        src={item.imageUrl.replace('-1280', '-640')}
-                        alt=""
-                        aria-hidden
+                        src={item.imageUrl.replace('-1280', '-256')}
+                        alt={`NFT ${item.nftId.replace('nft-', '')}`}
                         className="size-[70px] shrink-0 rounded-lg object-cover"
                       />
                       <div className="ml-[7px] min-w-0">
