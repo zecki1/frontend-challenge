@@ -26,7 +26,7 @@ test("nft.updated via Socket.IO atualiza o preço no detalhe", async ({
     .click();
   await expect(page).not.toHaveURL(/\/login/);
   if (test.info().project.name === "chromium-desktop") {
-    await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Menu do usuário" })).toBeVisible();
   }
 
   await page.goto("/nfts/nft-001");
