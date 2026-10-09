@@ -12,27 +12,6 @@
       content="KURIO — marketplace de NFTs: colecionáveis digitais verificados, lançamentos de edição limitada e cultura digital."
     />
     <title>KURIO — Marketplace de NFTs</title>
-    <script>
-      // Aplica o tema salvo antes da hidratação (evita flash e o aviso de
-      // <script> renderizado via React — ver src/components/providers/theme-provider.tsx)
-      ;(function () {
-        try {
-          var d = document.documentElement
-          function theme(t) {
-            if (t === 'system') {
-              t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-            }
-            d.classList.remove('light', 'dark')
-            if (t === 'dark' || t === 'light') {
-              d.style.colorScheme = t
-              d.classList.add(t)
-            }
-          }
-          var saved = localStorage.getItem('theme')
-          theme(saved === 'light' || saved === 'dark' ? saved : 'system')
-        } catch (e) {}
-      })()
-    </script>
   </head>
   <body>
     <div id="root"></div>

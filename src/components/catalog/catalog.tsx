@@ -182,7 +182,7 @@ export function CatalogSection(props: CatalogProps) {
               </ul>
 
               <nav aria-label={t('home.pagination.nav')} className="mt-10 flex items-center justify-end gap-2">
-                {(props.data.totalPages > 0 ? Array.from({ length: props.data.totalPages }) : [1]).map(
+                {((props.data?.totalPages ?? 0) > 0 ? Array.from({ length: props.data.totalPages }) : [1]).map(
                   (_, index) => {
                     const pageNumber = index + 1
                     const active = pageNumber === props.page
@@ -205,7 +205,7 @@ export function CatalogSection(props: CatalogProps) {
                 )}
                 <button
                   type="button"
-                  disabled={props.page >= props.data.totalPages}
+                  disabled={props.page >= (props.data?.totalPages ?? 0)}
                   onClick={() => props.onPageChange(props.page + 1)}
                   aria-label={t('home.pagination.next')}
                   className="flex h-[35px] w-[35px] items-center justify-center rounded-[4px] border border-[#3f2319] text-kurio-cream transition-colors hover:bg-kurio-surface disabled:opacity-40"
