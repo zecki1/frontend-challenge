@@ -32,7 +32,14 @@ export class ApiError extends Error {
 
   /** Converte uma falha do Axios (ou qualquer erro) em `ApiError`. */
   static fromAxios(error: AxiosError<ApiErrorBody>): ApiError {
-    const body = error.response?.data
+    const rawBody = error.response?.data
+    // O corpo pode ser HTML/string quando não há backend (ex.: host estático
+    // devolvendo index.html) — nesse caso não há `message`, e o fallback abaixo
+    // entrega uma mensagem contextual em vez de "Ocorreu um erro inesperado".
+    const body =
+      rawBody && typeof rawBody === 'object' && !Array.isArray(rawBody)
+        ? (rawBody as ApiErrorBody)
+        : undefined
     const status = error.response?.status ?? 0
 
     if (!error.response) {
@@ -46,10 +53,19 @@ export class ApiError extends Error {
       })
     }
 
+    const fallbackMessage =
+      status === 404
+        ? 'Recurso não encontrado.'
+        : status === 403
+          ? 'Acesso negado pelo servidor.'
+          : status >= 500
+            ? 'O servidor está indisponível no momento.'
+            : 'Ocorreu um erro inesperado.'
+
     return new ApiError({
       status,
       code: body?.code ?? 'transient_error',
-      message: body?.message ?? 'Ocorreu um erro inesperado.',
+      message: body?.message ?? fallbackMessage,
       details: body?.details ?? null,
       requestId: body?.requestId,
     })

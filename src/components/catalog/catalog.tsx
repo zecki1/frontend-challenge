@@ -146,16 +146,24 @@ export function CatalogSection(props: CatalogProps) {
             </div>
           ) : null}
 
-          {props.isLoading ? (
-            <ul className="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-3 md:gap-x-[34px] md:gap-y-[72px] max-md:[&>*:nth-child(even)]:mt-8">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <li key={index} className="space-y-3">
-                  <div className="h-[200px] w-full skeleton rounded-xl bg-kurio-surface md:h-[300px]" />
-                  <div className="h-4 w-3/4 skeleton rounded bg-kurio-surface" />
-                  <div className="h-4 w-1/3 skeleton rounded bg-kurio-surface" />
-                </li>
-              ))}
-            </ul>
+          {props.isLoading || (!props.data && !props.isError) ? (
+            <>
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-3 md:gap-x-[34px] md:gap-y-[72px] max-md:[&>*:nth-child(even)]:mt-8">
+                {Array.from({ length: 12 }).map((_, index) => (
+                  <li key={index} className="space-y-0.5">
+                    {/* Alturas casadas com o NftCard real (200 + 8 + 23 + 2 + 24 = 257px) p/ não haver layout shift na troca esqueleto→dados */}
+                    <div className="h-[200px] w-full skeleton rounded-xl bg-kurio-surface md:h-[300px]" />
+                    <div className="mt-2 h-[23px] w-3/4 skeleton rounded bg-kurio-surface" />
+                    <div className="h-6 w-1/3 skeleton rounded bg-kurio-surface" />
+                  </li>
+                ))}
+              </ul>
+              {/* Reserva o espaço da paginação (mt-10 + h-[35px]) durante o loading */}
+              <nav
+                aria-hidden
+                className="mt-10 flex h-[35px] items-center justify-end gap-2"
+              />
+            </>
           ) : props.data && props.data.items.length === 0 ? (
             <p className="rounded-lg border border-dashed border-kurio-surface p-8 text-center text-sm text-kurio-sand">
               {t('common.empty')}
@@ -163,8 +171,13 @@ export function CatalogSection(props: CatalogProps) {
           ) : props.data ? (
             <>
               <ul className="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-3 md:gap-x-[34px] md:gap-y-[72px] max-md:[&>*:nth-child(even)]:mt-8">
-                {props.data.items.map((nft) => (
-                  <NftCard key={nft.id} nft={nft} showRarityBadge={props.showRarityBadge} />
+                {props.data.items.map((nft, nftIndex) => (
+                  <NftCard
+                    key={nft.id}
+                    nft={nft}
+                    showRarityBadge={props.showRarityBadge}
+                    eager={nftIndex < 4}
+                  />
                 ))}
               </ul>
 
@@ -352,7 +365,15 @@ export function FeaturedBanner() {
   )
 }
 
-export function NftCard({ nft, showRarityBadge = false }: { nft: Nft; showRarityBadge?: boolean }) {
+export function NftCard({
+  nft,
+  showRarityBadge = false,
+  eager = false,
+}: {
+  nft: Nft
+  showRarityBadge?: boolean
+  eager?: boolean
+}) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
@@ -433,7 +454,8 @@ export function NftCard({ nft, showRarityBadge = false }: { nft: Nft; showRarity
             alt={`Arte do NFT ${nft.name}`}
             width={250}
             height={250}
-            loading="lazy"
+            loading={eager ? 'eager' : 'lazy'}
+            fetchPriority={eager ? 'high' : 'auto'}
             className="mx-auto mt-3 h-[168px] w-[168px] rounded-xl object-cover transition-transform duration-300 group-hover:scale-[1.03] md:absolute md:left-1/2 md:top-[31px] md:mt-0 md:h-[250px] md:w-[250px] md:-translate-x-1/2 md:rounded-none"
           />
           {nft.rarity === 'legendary' ? (

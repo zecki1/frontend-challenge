@@ -215,7 +215,17 @@ function PromosSection() {
             data-aos="fade-up"
             className="flex min-h-[250px] overflow-hidden rounded-xl bg-kurio-surface"
           >
-            <img src={promo.image} alt="" aria-hidden width={640} height={500} className="w-1/2 object-cover" loading="lazy" />
+            {/* Primeira imagem não-lazy e com prioridade alta: é o LCP na home mobile */}
+            <img
+              src={promo.image}
+              alt=""
+              aria-hidden
+              width={640}
+              height={500}
+              className="w-1/2 object-cover"
+              loading={index === 0 ? 'eager' : 'lazy'}
+              fetchPriority={index === 0 ? 'high' : 'auto'}
+            />
             <div className="flex flex-1 flex-col items-end justify-between px-6 py-6 text-right">
               <div>
                 <p className="whitespace-pre-line text-lg font-bold leading-6 text-kurio-cream">{promo.title}</p>
