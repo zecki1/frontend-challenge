@@ -3,17 +3,22 @@ import { Link, useNavigate, useRouter } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
-  ArrowLeft,
   Heart,
   Linkedin,
   MessageCircle,
   Minus,
   Plus,
-  ShoppingBag,
   Star,
   Twitter,
   ZoomIn,
 } from 'lucide-react'
+import {
+  RiArrowLeftLine,
+  RiHeartFill,
+  RiHeartLine,
+  RiShoppingBagLine,
+  RiStarFill,
+} from 'react-icons/ri'
 import { Controlled as ControlledZoom } from 'react-medium-image-zoom'
 import 'react-medium-image-zoom/dist/styles.css'
 import { cartApi, favoritesApi, nftsApi, queryKeys } from '@/api'
@@ -239,7 +244,7 @@ export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
               onClick={() => router.history.back()}
               className="flex size-[35px] items-center justify-center rounded-full border border-[#3f2319] bg-kurio-surface2 text-kurio-cream transition-colors hover:text-kurio-copper"
             >
-              <ArrowLeft className="size-5" aria-hidden />
+              <RiArrowLeftLine className="size-5" aria-hidden />
             </button>
             <button
               type="button"
@@ -248,14 +253,11 @@ export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
               onClick={onToggleFavorite}
               className="flex size-[35px] items-center justify-center rounded-full border border-[#3f2319] bg-kurio-surface2 transition-colors"
             >
-              <Heart
-                aria-hidden
-                className={
-                  isFavorite
-                    ? 'size-4 fill-kurio-copper text-kurio-copper'
-                    : 'size-4 text-kurio-copper'
-                }
-              />
+              {isFavorite ? (
+                <RiHeartFill aria-hidden className="size-4 text-kurio-copper" />
+              ) : (
+                <RiHeartLine aria-hidden className="size-4 text-kurio-copper" />
+              )}
             </button>
           </div>
           <div className="relative mx-7 mt-2 h-[356px]">
@@ -289,11 +291,11 @@ export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
           </div>
         </div>
 
-        <div className="relative z-10 -mt-[114px] bg-kurio-surface px-6 pt-8">
+        <div className="relative z-10 -mt-[114px] rounded-t-lg border-t border-[#3f2319] bg-kurio-surface px-6 pt-8">
           <div className="flex h-[27px] items-center justify-between gap-3">
             <h1 className="truncate text-xl font-bold text-kurio-cream">{nft.name}</h1>
             <span className="flex h-[27px] shrink-0 items-center gap-1 rounded-full border border-kurio-copper px-2 text-sm">
-              <Star className="size-3.5 fill-kurio-copper text-kurio-copper" aria-hidden />
+              <RiStarFill className="size-3.5 text-kurio-copper" aria-hidden />
               <span className="font-medium text-kurio-cream">{t('nft.rating')}</span>
               <span className="text-kurio-sand">({REVIEW_COUNT})</span>
             </span>
@@ -312,40 +314,41 @@ export function NftDetailPage({ nftId: rawNftId }: NftDetailPageProps) {
             <p>{t('nft.attributesLabel')}: {t('nft.attributesValue')}</p>
           </div>
 
-          <div className="mt-[38px] pb-[34px]">
-            <div className="flex h-[30px] items-center justify-between gap-4">
-              <div
-                role="group"
-                aria-label={t('nft.quantity')}
-                className="flex items-center gap-2.5"
-              >
-                <span className="text-[15px] font-medium text-kurio-sand">{t('nft.qtyShort')}</span>
-                <div className="flex items-center gap-2.5">{stepperButtons('h-[30px] w-5 rounded-full')}</div>
-              </div>
-              <span className="text-xl font-bold text-kurio-copper">
-                {formatEth(nft.priceEth)} ETH
-              </span>
+        </div>
+
+        <div className="bg-kurio-surface px-6 pt-[38px] pb-[34px]">
+          <div className="flex h-[30px] items-center justify-between gap-4">
+            <div
+              role="group"
+              aria-label={t('nft.quantity')}
+              className="flex items-center gap-2.5"
+            >
+              <span className="text-[15px] font-medium text-kurio-sand">{t('nft.qtyShort')}</span>
+              <div className="flex items-center gap-2.5">{stepperButtons('h-[30px] w-5 rounded-full')}</div>
             </div>
-            <div className="mt-5 flex gap-3">
-              <button
-                type="button"
-                disabled={isSoldOut || addToCart.isPending}
-                onClick={() => selectedEdition && addToCart.mutate(selectedEdition.id)}
-                className="h-[60px] w-[196px] rounded-full bg-gradient-to-b from-kurio-copper to-kurio-copperLight text-base font-bold text-kurio-bg transition-opacity disabled:opacity-50"
-              >
-                {isSoldOut ? t('nft.soldOut') : addToCart.isPending ? t('nft.adding') : t('nft.buyNow')}
-              </button>
-              <Link
-                to="/cart"
-                aria-label={t('nav.carrinho')}
-                className="flex size-[60px] items-center justify-center rounded-full border border-[#3f2319] bg-kurio-surface2 text-kurio-cream transition-colors hover:text-kurio-copper"
-              >
-                <ShoppingBag className="size-5" aria-hidden />
-              </Link>
-            </div>
-            {cartError ? <div className="mt-3">{cartError}</div> : null}
-            {cartMessage ? <div className="mt-3">{cartMessage}</div> : null}
+            <span className="text-xl font-bold text-kurio-copper">
+              {formatEth(nft.priceEth)} ETH
+            </span>
           </div>
+          <div className="mt-5 flex gap-3">
+            <button
+              type="button"
+              disabled={isSoldOut || addToCart.isPending}
+              onClick={() => selectedEdition && addToCart.mutate(selectedEdition.id)}
+              className="h-[60px] w-[196px] rounded-full bg-gradient-to-b from-kurio-copper to-kurio-copperLight text-base font-bold text-kurio-bg transition-opacity disabled:opacity-50"
+            >
+              {isSoldOut ? t('nft.soldOut') : addToCart.isPending ? t('nft.adding') : t('nft.buyNow')}
+            </button>
+            <Link
+              to="/cart"
+              aria-label={t('nav.carrinho')}
+              className="flex size-[60px] items-center justify-center rounded-full border border-[#3f2319] bg-kurio-surface2 text-kurio-cream transition-colors hover:text-kurio-copper"
+            >
+              <RiShoppingBagLine className="size-5" aria-hidden />
+            </Link>
+          </div>
+          {cartError ? <div className="mt-3">{cartError}</div> : null}
+          {cartMessage ? <div className="mt-3">{cartMessage}</div> : null}
         </div>
       </div>
 
