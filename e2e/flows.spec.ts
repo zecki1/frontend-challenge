@@ -51,7 +51,13 @@ test("fluxo completo de compra", async ({ page }) => {
   ).toBeVisible();
 
   await page.goto("/checkout");
-  const networkSelect = page.locator("select").filter(visible).first();
+  // Seleciona carteira (desktop: select#co-wallet-type)
+  const walletSelect = page.locator('select[id="co-wallet-type"]').filter(visible).first();
+  if ((await walletSelect.count()) > 0) {
+    await walletSelect.selectOption({ index: 1 });
+  }
+  // Seleciona rede (desktop: select#co-network)
+  const networkSelect = page.locator('select[id="co-network"]').filter(visible).first();
   if ((await networkSelect.count()) > 0) {
     await networkSelect.selectOption({ index: 1 });
   }
