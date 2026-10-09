@@ -176,6 +176,10 @@ A base arquitetural está completa e a fidelidade visual com o Figma foi aplicad
 
 Roteiro de cada perfil: navegar as rotas públicas, logar com as credenciais do README (seção Cenários), adicionar NFT ao carrinho, aplicar cupom, fechar o fluxo de compra até a confirmação, recarregar em `/mercado/nft/001` (rota direta), checar footer e tempo real (abrir a página em duas abas e ver o preço atualizando).
 
+O checklist detalhado por tela (fiel aos frames mobile do Figma) está em [`docs/CHECKLIST-MOBILE.md`](docs/CHECKLIST-MOBILE.md) — usá-lo para marcar cada item durante a validação.
+
+Erros reportados e seu estado de correção (tab bar, catálogo, PageSpeed, agêntica) estão consolidados em [`docs/CHECKLIST-ERROS.md`](docs/CHECKLIST-ERROS.md).
+
 ### ⏱️ Estimativas (a partir de agora)
 
 | Item | Esforço estimado |
