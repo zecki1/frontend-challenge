@@ -160,6 +160,9 @@ A base arquitetural está completa e a fidelidade visual com o Figma foi aplicad
 1. **Testar o deploy na Vercel** após este commit ser mergeado em `main`: conferir mocks/tempo real no ambiente real (o deploy usa o build de demonstração `npm run build:demo`), o rewrite SPA nas rotas diretas e os arquivos `robots.txt`/`sitemap.xml`.
 2. **Matriz de dispositivos** (abaixo) — validar em pelo menos um aparelho físico além do emulador.
 3. **Afinar o que aparecer nos testes** — itens prováveis listados em "Melhorias".
+4. **PageSpeed pós-upload** — Lighthouse no domínio real (método na seção Performance) e conferência dos artefatos `robots.txt`/`sitemap.xml`/`llms.txt`/`ai-catalog.json` servidos.
+5. **Comunicações** — tempo real em duas abas e os fluxos de OS/newsletter (payload `[mock:resend]` no console).
+6. **Limpeza final** — corrigir os ~19 erros de lint antigos (checkout/catálogo/detalhe) listados em Melhorias.
 
 ### 📱 Matriz de dispositivos (pré-entrega)
 
@@ -192,7 +195,60 @@ Roteiro de cada perfil: navegar as rotas públicas, logar com as credenciais do 
 - **6 warnings** `react-refresh/only-export-components` no ESLint.
 - **§9 regressão visual E2E**: o config já aponta `snapshotDir`, mas nenhum `toHaveScreenshot` foi escrito — gerar baselines de home/detalhe/carrinho.
 - **`uses-responsive-images`** no Lighthouse: só existem variantes 640/1280 das artes; gerar 320/480 economiza ~70 ms.
+- **~19 erros de lint antigos** em `checkout.tsx` (hooks após early return), `catalog.tsx`/`nft-detail-page.tsx` (setState em effect) e outros — aguardando a limpeza final; não afetam build/typecheck/E2E.
 - **`unused-javascript`/`bf-cache`** (~300 ms): inerentes ao build de demonstração com MSW — não há o que fazer sem abrir mão dos mocks em produção.
+
+---
+
+## Destaques de implementação (além do pedido)
+
+Além dos fluxos do enunciado, esta rodada entregou três frentes pensadas como produto — acessibilidade, idiomas e suporte. O "como" e as decisões tomadas estão no Registro de Decisões, no fim do documento.
+
+### Acessibilidade para o usuário real
+
+- **Fonte OpenDyslexic** self-hosted (`public/fonts/`, woff2 + woff) para leitura com dislexia, ligável em `/account/accessibility` junto com tamanho de fonte global e tema claro/escuro/sistema.
+- **VLibras** (Libras): widget oficial injetado sob demanda, preferência persistida e falha segura offline — se o script não carregar, o app continua funcionando.
+- **Filtros de daltonismo** (Protanopia, Deuteranopia, Tritanopia, Monocromia) aplicados via CSS em toda a página.
+- Ajustes persistidos em `pref-*` no `localStorage`, aplicados sem reload.
+
+### Internacionalização completa
+
+- **pt-BR / en / es** em todas as telas e mensagens de erro (i18next, `src/i18n/locales/*.json`), com seletor em `/account/language`. Testei os três idiomas nas rotas principais para caçar quebra de layout (ver a decisão "Overflow de texto").
+
+### Perfil que reflete o uso real
+
+- `/account/` ganhou **Atividade** (NFTs que o usuário abriu ou interagiu), **Lista de interesse** (todos os favoritos) e **Ofertas** (menores preços do catálogo), além de Perfil, Carteiras, Idioma, Acessibilidade e Suporte.
+- Salvar o perfil atualiza a sessão na hora: nome/e-mail refletem no header e no checkout sem reload.
+
+### Conta
+
+- Modal **"Criar conta"** integrado ao login (e-mail/senha + Google/Facebook); os dados cadastrados fluem para o checkout. O schema de registro é compartilhado com a página `/register`.
+
+---
+
+## Comunicação com a API — sem expor nada no frontend
+
+Regra que vale para qualquer integração do app: **nenhuma chave ou segredo existe no bundle do navegador**. Quem precisa só envia o dado; quem tem o segredo é o backend — ou o mock, em dev/demo. Na prática:
+
+- **API relativa e mesma origem.** O cliente HTTP usa `baseURL: '/api'` — sem URL pública de backend, sem CORS e sem endereço descoberto no bundle.
+- **Token opaco, nunca senha.** A sessão guarda apenas o token devolvido pela API; o interceptor injeta `Authorization: Bearer` em toda requisição.
+- **Erros unificados.** O interceptor converte falhas em `ApiError` com código de negócio (`session_expired`, `validation_error`…) e dispara `auth:expired` para a interface limpar a sessão sozinha.
+- **Contratos tipados por endpoint** (`src/api/endpoints/*`) e query-keys: mudar o contrato quebra o build, não só o teste.
+- **Mesma superfície com e sem backend.** Em dev/demo/testes o MSW responde pelos mesmos endpoints, validações e latências. Em produção, `VITE_API_URL` aponta para o backend real — o app não sabe nem precisa saber quem está respondendo.
+- **E-mails saem do backend.** O Resend é chamado no servidor; em dev/demo o MSW reproduz o payload exato (`[mock:resend] emails.send`) em `support.ts` e `newsletter.ts`. A chave `RESEND_API_KEY` não existe nas variáveis do frontend (removi uma chamada direta da newsletter na última rodada — detalhes no Registro de Decisões).
+
+---
+
+## Suporte ao cliente — Ordens de Serviço (OS)
+
+Montei o atendimento para receber tudo o que o cliente descreve, com rastreabilidade e sem depender de e-mail solto:
+
+1. **Widget flutuante** no canto inferior direito, ativado em `/account/support` (preferência persistida).
+2. O cliente **descreve o problema**, escolhe **categoria** (pedido, bug, conta, NFT, sugestão, outro) e **urgência** (sugerida pela categoria, editável).
+3. Ao enviar, o widget **captura um print da tela** (html2canvas carregado sob demanda — chunk separado de ~200 kB, não pesa no carregamento inicial) e anexa à OS.
+4. O backend gera a **OS** (`OS-2026-0001`), o **nível P1–P4** (crítica → baixa) e o **SLA por categoria** (pedido 4 h, bug 8 h, conta 12 h, NFT 24 h…).
+5. A notificação sai pelo **backend (Resend)** — payload reproduzido fielmente nos mocks, pronto para trocar por uma chamada real com `RESEND_API_KEY` sem mudar o frontend.
+6. `/account/support` lista as OS do usuário: número, data, o que pediu, urgência, status (**aberta / em andamento / resolvida**) e ação **"Marcar resolvida"**. Cada usuário enxerga só as próprias OS.
 
 ---
 
@@ -245,10 +301,8 @@ As branches `main`, `homolog` e `develop` possuem proteção com checks obrigat�
 
 ## Assets e Otimização
 
-- **4 artes reais** extraídas do Figma (PNG 1254×1254) → `design/assets/` → convertidas para WebP (640 e 1280) via `npm run images:optimize` (~95% redução).
+- **4 artes reais** extraídas do Figma (PNG 1254×1254), convertidas para WebP (640 e 1280) via `npm run images:optimize` (~95% redução).
 - **Ícones via React Icons** (`react-icons@5.7.0`, já usado no `App.tsx`) → import de `react-icons/fa`, `react-icons/fc`, etc. Os 113 SVGs de `public/icons/` foram removidos por não serem referenciados em nenhum ponto do app (só `google.svg` e `facebook.svg` eram usados, agora substituídos por `FcGoogle` e `FaFacebookF`).
-- **Specs por tela** (posições, tamanhos, textos, cores) → `design/screens/`.
-- Tokens de design (fonte, paleta, tamanhos) → `design/README.md`.
 - Fontes self-hosted: **Inter** + **Roboto Mono** como woff2 variáveis em `public/fonts/`, apenas subsets `latin`/`latin-ext` (o app usa pt-BR/en/es — cyrillic/greek/vietnamese moravam no CSS sem uso), carregadas por `src/styles/fonts.css` com `font-display: swap`. Zero requests ao Google Fonts.
 
 ---
@@ -366,6 +420,46 @@ Duas mudanças pareciam ganho óbvio e saíram da rodada porque medi o antes/dep
 
 Ficaram: fontes self-hosted com subsets cortados, `width`/`height` + `loading="lazy"` nas imagens, `robots.txt`/`sitemap.xml`, e o slider com alvo ≥ 24 px.
 
+### Overflow de texto: alturas e larguras fixas vindas do Figma
+
+Muitos blocos vêm do Figma com `height`/`line-height` travados (título do hero, cards de features, linhas de preço). Isso funciona no pt-BR, mas a tradução (en/es) ou o aumento de fonte de acessibilidade podem **estourar o texto para fora da caixa**. Regra aplicada:
+
+- Sempre que o conteúdo puder crescer (i18n, `pref-size`, fonte OpenDyslexic), **deixar a altura fluir** (`min-h` em vez de `height`, `line-height` flexível) ou quebrar a linha.
+- Medidas fixas só valem para elementos realmente rígidos (botões `h-11`, inputs `h-11`, badges).
+- Se um layout novo estourar no teste de acessibilidade (fonte 18–24 px), o arquivo do Figma é referência, não cláusula: ajustar o tamanho/leading antes de cortar o texto.
+
+### Suporte: a OS nasceu de pensar no fluxo real de atendimento
+
+Antes de desenhar a tela de suporte, me perguntei o que acontece hoje com um cliente que tem um problema: ele descreve por e-mail solto, perde o print e o time não tem rastreabilidade. A **OS (ordem de serviço)** resolve isso com três escolhas:
+
+- **Print da tela no momento do problema**: capturo com html2canvas no clique de enviar. Decidi carregá-lo com `import()` dinâmico — vira um chunk separado (~200 kB) e não entra no bundle inicial.
+- **Urgência sugerida pela categoria**: pedido é urgentíssimo (SLA 4 h), sugestão não é (48 h). Sugiro o padrão no formulário, mas deixo editável — o cliente nem sempre sabe o quão urgente é, e o time pode reclassificar depois.
+- **Isolamento por usuário**: cada OS guarda o `userId`; a tabela só devolve as do usuário logado, mesmo com o mock.
+
+O e-mail via Resend saiu do frontend de propósito: o handler do MSW reproduz o payload exato de `resend.emails.send`, então a troca para o backend real é só plugar a chave (`RESEND_API_KEY`) do lado do servidor.
+
+### Comunicação com a API: a chave da newsletter também saiu do bundle
+
+Valei a regra de não expor segredo auditando o que já existia. A newsletter do footer chamava a API do Resend direto do navegador com `Bearer ${VITE_RESEND_API_KEY}` — no dia em que alguém setasse a variável, a chave iria parar no bundle publicável. Removi:
+
+- `src/lib/email.ts` agora só informa o backend do novo assinante (`POST /api/newsletter/subscribe`);
+- o envio real fica no handler MSW (`newsletter.ts`), no mesmo padrão `[mock:resend]` do suporte;
+- `VITE_RESEND_API_KEY` saiu do `env.ts` e do `.env.example`.
+
+O restante da camada já estava no lugar: API relativa (`/api`), token opaco injetado por interceptor e contratos tipados por endpoint.
+
+### Acessibilidade, idiomas e console limpo
+
+Três decisões renderam frutos nesta rodada:
+
+- **OpenDyslexic self-hosted**: os woff2/woff estão em `public/fonts/` (`@font-face` + classe `.font-dyslexic`). Sem CDN: a fonte carrega junto com o app e não depende de terceiro.
+- **VLibras com falha segura**: o widget injeta o script oficial só quando a preferência está ligada; se falhar ou estiver offline, nada é appendado e o app continua.
+- **O tema que sujava o console**: o aviso "Encountered a script tag while rendering React component" aparecia em toda página e era do next-themes 0.4, que renderiza um `<script>` via React sem opção de desativar. Troquei por um `ThemeProvider` próprio (~30 linhas, mesma API) e movi a inicialização do tema para um script inline no `index.html` — sem aviso e sem flash. Na mesma varredura, silenciei o log de requests do MSW no console (`quiet: true` no `start()`) e validei o console limpo via Playwright em `/` e `/mercado/nft/001`.
+
+### llms.txt de volta — decisão de reversão
+
+Numa rodada anterior o `llms.txt` saiu do projeto. Com a auditoria de PageSpeed/SEO desta entrega, voltei atrás: um `llms.txt` com **links reais** de todas as páginas é um artefato de descoberta servido pelo próprio domínio, e o `ai-catalog.json` (catálogo JSON legível por máquina) segue o mesmo princípio. Ambos estão em `public/` e são servidos pelo SPA fallback dos rewrites.
+
 ### Validação
 
 Rodo sempre a mesma bateria que o CI, nas mesmas condições (`CI=1`, `workers=1`, `retries=2`): `typecheck`, `lint`, `build:demo` e `test:e2e`. É a única forma de ter certeza de que o que passa localmente vai passar no GitHub.
@@ -376,5 +470,3 @@ Rodo sempre a mesma bateria que o CI, nas mesmas condições (`CI=1`, `workers=1
 
 - [`ARCHITECTURE.md`](./ARCHITECTURE.md) — contratos REST, eventos, sessão, carrinho, cache, mocks, limitações, desvios do Figma.
 - [`docs/ENUNCIADO.md`](./docs/ENUNCIADO.md) — enunciado completo do desafio.
-- `design/README.md` — tokens de design extraídos do Figma.
-- `design/screens/*.json` — specs por tela (desktop/mobile).

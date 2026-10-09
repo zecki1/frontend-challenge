@@ -1,0 +1,57 @@
+{
+  "$schema": "https://schema.ai-catalog.org/1.0/schema.json",
+  "name": "KURIO NFT Marketplace",
+  "description": "Marketplace de NFTs para colecionadores, criadores e cultura digital",
+  "version": "1.0.0",
+  "url": "https://kurio.app",
+  "author": {
+    "name": "KURIO Team",
+    "url": "https://kurio.app"
+  },
+  "capabilities": [
+    "nft-discovery",
+    "nft-purchase",
+    "wallet-management",
+    "real-time-updates",
+    "accessibility",
+    "internationalization"
+  ],
+  "endpoints": {
+    "api": "/api",
+    "websocket": "/socket.io"
+  },
+  "features": {
+    "nft-catalog": {
+      "filters": ["category", "rarity", "network", "price-range"],
+      "sorting": ["recent", "price-asc", "price-desc", "rarity"],
+      "pagination": true
+    },
+    "nft-detail": {
+      "gallery": true,
+      "editions": true,
+      "favorites": true,
+      "cart": true
+    },
+    "checkout": {
+      "collector-data": true,
+      "wallet-selection": true,
+      "network-selection": true,
+      "idempotency": true
+    },
+    "real-time": {
+      "nft-updates": true,
+      "order-updates": true
+    },
+    "accessibility": {
+      "color-blindness": ["protanopia", "deuteranopia", "tritanopia", "monochrome"],
+      "dyslexia-font": true,
+      "reduced-motion": true,
+      "keyboard-navigation": true
+    },
+    "i18n": ["pt-BR", "en", "es"]
+  },
+  "mocking": {
+    "msw": true,
+    "socket-io": true
+  }
+}

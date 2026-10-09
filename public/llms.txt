@@ -1,0 +1,69 @@
+# KURIO — NFT Marketplace
+
+KURIO é um marketplace de NFTs para colecionadores, criadores e cultura digital. Descubra NFTs selecionados de criadores emergentes e consagrados, colecione arte digital rara e apoie artistas.
+
+> Documento opcional do site para LLMs (llms.txt). Versionamento e endpoints legíveis por máquina em [ai-catalog.json](https://kurio.app/ai-catalog.json). Conteúdo do projeto em [llms-full.txt](https://kurio.app/llms-full.txt), quando disponível.
+
+## Visão Geral
+
+- **Nome**: KURIO — Marketplace de NFTs
+- **Descrição**: Marketplace de NFTs para descoberta, compra e gestão de colecionáveis digitais verificados
+- **Tecnologias**: React, TypeScript, TanStack Router, TanStack Query, Tailwind CSS, shadcn/ui, MSW, Socket.IO
+- **Idiomas**: Português (pt-BR, padrão), Inglês (en), Espanhol (es)
+
+## Páginas Principais
+
+- [Início](https://kurio.app/) — Hero, catálogo em destaque, promoções e blog
+- [Mercado](https://kurio.app/mercado) — Catálogo completo com filtros, busca e paginação
+- [Detalhe do NFT](https://kurio.app/mercado/nft/:nftNumber) — Galeria, informações, edições, favoritos e compra (ex.: [https://kurio.app/mercado/nft/001](https://kurio.app/mercado/nft/001))
+- [Carrinho](https://kurio.app/cart) — Gestão de itens, cupom, resumo de valores
+- [Checkout](https://kurio.app/checkout) — Dados do colecionador, carteira, rede, revisão e confirmação
+- [Confirmação de Pedido](https://kurio.app/orders/:orderId) — Resultado, transação, itens, taxas e total
+- [Favoritos](https://kurio.app/favorites) — NFTs favoritados pelo usuário
+- [Perfil](https://kurio.app/account/profile) — Edição de dados, avatar, alteração de senha
+- [Carteiras](https://kurio.app/account/wallets) — Cadastro e edição de carteiras principal e secundária
+- [Atividade](https://kurio.app/account/activity) — NFTs abertos ou com interação recente
+- [Lista de interesse](https://kurio.app/account/watchlist) — Todos os NFTs favoritados
+- [Ofertas](https://kurio.app/account/offers) — NFTs com os menores preços do catálogo
+- [Acessibilidade](https://kurio.app/account/accessibility) — Fonte, tema, filtros de cor, OpenDyslexic e VLibras
+- [Idioma](https://kurio.app/account/language) — Escolha entre Português, Inglês e Espanhol
+- [Suporte](https://kurio.app/account/support) — Ordens de serviço (OS) com print da tela e e-mail via Resend
+- [Login](https://kurio.app/login) — Autenticação com e-mail/senha
+- [Cadastro](https://kurio.app/register) — Criação de conta
+
+## APIs e Integrações
+
+- **REST API** — Endpoints para sessão, NFTs, favoritos, carrinho, cotação, pedidos, perfil, carteiras, atividade e suporte
+- **Socket.IO** — Tempo real para `nft.updated` (preço/disponibilidade) e `order.updated` (status do pedido)
+- **MSW** — Mocking da API e Socket.IO para desenvolvimento, demonstração e testes
+- **Resend** — Envio de e-mails de suporte (ordens de serviço)
+
+## Acessibilidade
+
+- Navegação por teclado e foco visível
+- Controle de foco em diálogos e sheets
+- Semântica adequada, labels e mensagens de erro
+- Alternativas textuais para imagens
+- Contraste legível
+- Suporte a movimento reduzido (`prefers-reduced-motion`)
+- Filtros para daltonismo (Protanopia, Deuteranopia, Tritanopia, Monochrome)
+- Fonte OpenDyslexic para dislexia
+- Intérprete de Libras via VLibras
+
+## Assets
+
+- Fontes: Inter (latin, latin-ext), Roboto Mono, OpenDyslexic
+- Imagens NFT: WebP em 640w e 1280w (arte extraída do Figma)
+- Favicon: SVG
+
+## Desenvolvimento
+
+```bash
+npm install
+npm run dev        # Desenvolvimento com MSW
+npm run build      # Build de produção
+npm run preview    # Preview do build
+npm run test       # Testes E2E com Playwright
+npm run lint       # Lint com ESLint
+npm run typecheck  # Verificação de tipos TypeScript
+```
